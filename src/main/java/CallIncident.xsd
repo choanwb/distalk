@@ -1,0 +1,430 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+- Messages processed by OBIcall pertaining to incidents. These messages are
+- mostly send by OBIdis or OBIweg.
+-
+- OBIcall identificeerd incidenten richting OBIdis met een
+- incident nummer en een actie nummer. OBIdis/OBIweg moet beide nummers
+- repliceren in alle (antwoord-)berichten richting OBIcall.
+-->
+
+<xs:schema xmlns='http://anwb.org/hv/ict/oxi/callinc'
+  targetNamespace='http://anwb.org/hv/ict/oxi/callinc'
+  xmlns:xs='http://www.w3.org/2001/XMLSchema'
+  xmlns:obi='http://anwb.org/hv/ict/oxi/obi'
+  elementFormDefault='qualified'>
+
+  <xs:import namespace='http://anwb.org/hv/ict/oxi/obi'/>
+
+  <!--
+  - Message send from OBIdis to OBIcall.
+  - Met dit bericht kan een incident door de WEG-organisatie worden
+  - teruggegeven aan CALL. De WEG zal het niet verder in behandeling namen.
+  -->
+  <xs:complexType name='teruggevenIncidentMessage'>
+    <xs:sequence>
+      <!-- Identificatie van het teruggegeven incident. -->
+      <xs:element name='incidentnummer' type='xs:int'/>
+
+      <!-- actienummer slaat op sleutelhulp en veiligstel gecombineerd -->
+      <xs:element name='actienummer' type='xs:int' minOccurs='0'/>
+      <xs:element name='transportActienummer' type='xs:int' minOccurs='0' />
+
+      <!-- Enventueele reden van de teruggave. -->
+      <xs:element name='omschrijving' type='xs:string' minOccurs='0'/>
+
+      <!-- Identificatie van de teruggever. -->
+      <xs:element name='personeelsnummer' type='xs:int' />
+      <xs:element name='naam' type='xs:string' />
+
+      <!-- Tijdstip teruggave -->
+      <xs:element name='tijdstip' type='xs:dateTime' />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+  - Message send from OBIweg to OBIcall.
+  - Met dit bericht wordt melding gemaakt van een wegenwacht aantekening
+  - Geen retour bericht.
+  -->
+  <xs:complexType name='meldenWWaantekeningMessage'>
+    <xs:sequence>
+      <!-- De incident indentificatie. -->
+      <xs:element name='incidentnummer' type='xs:int'/>
+
+      <xs:element name='personeelsnummer' type='xs:int' />
+      <xs:element name='kenteken' type='xs:string' minOccurs='0' />
+      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0' />
+      <xs:element name='aantekening' type='xs:string' />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+  - Message send from OBIdis to OBIcall.
+  -->
+  <xs:complexType name='meldenStatusMessage'>
+    <xs:all>
+      <xs:element name='incidentnummer' type='xs:int' />
+      <xs:element name='actienummer'    type='xs:int' />
+      <xs:element name='incidentstatus' type='StatusEnum' />
+      <xs:element name='taak'           type='obi:TaakTypeEnum'/>
+      <xs:element name='taakstatus'     type='StatusEnum'/>
+      <!--xs:element name='wegenwacht'     type='obi:Wegenwacht' minOccurs='0'/-->
+      <xs:element name='gecommuniceerdeWachttijd' type='xs:int' minOccurs='0'/>
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Message send from OBIweg to OBIcall.
+  - Met dit bericht kan WEG de journaalaantekenignen
+  - van een incident opvragen bij CALL.
+  -->
+  <xs:complexType name='opvragenJournaalaantekeningMessage'>
+    <xs:all>
+      <xs:element name='kenteken' type='xs:string' minOccurs='0' />
+      <!-- xs:choice -->
+      <!-- Bij een lid direct het klantLidnummer invullen, bij meerdere leden het wrapper element gebruiken -->
+      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
+      <xs:element name='klantLidnummers' type='KlantLidnummersType' minOccurs='0' />
+      <!-- /xs:choice -->
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="KlantLidnummersType">
+    <xs:sequence>
+      <xs:element name='klantLidnummer' type='klantLidnummerType' maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name='klantLidnummerType'>
+    <xs:simpleContent>
+      <xs:extension base='xs:int'>
+        <xs:attribute name='typeKlant' type='obi:TypeKlant' />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!--
+  <xs:element name='opvragenIncidentGegevens'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incidentnummer' type='xs:int' />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='antwoordenIncidentGegevens'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incident' type='Incident' minOccurs='0' />
+        <xs:element name='klant' type='Klant' minOccurs='0' />
+        <xs:element name='lidmaatschap' type='Lidmaatschap' minOccurs='0' />
+        <xs:element name='melder' type='Melder' minOccurs='0' />
+        <xs:element name='voertuig' type='Voertuig' minOccurs='0' />
+        <xs:element name='contract' type='Contract' minOccurs='0' />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  -->
+
+  <!--
+  - Response send from OBIcall to OBIweg.
+  - Het antwoord op het opvragen van journaalaantekeningen
+  -->
+  <xs:complexType name='antwoordenJournaalaantekeningMessage'>
+    <xs:all>
+      <xs:element name='journaalAantekeningLijst' minOccurs='0'>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name='journaalAantekening'
+              type='JournaalAantekening' minOccurs='0'
+                maxOccurs='unbounded' />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name='JournaalAantekening'>
+    <xs:all>
+      <xs:element name='inhoud' type='xs:string'/>
+      <xs:element name='lidnummer' type='xs:int' minOccurs='0'/>
+      <xs:element name='kenteken' type='xs:string' minOccurs='0'/>
+      <xs:element name='code' type='xs:string'/>
+      <xs:element name='type' type='obi:JournaalAantekeningTypeEnum'/>
+      <xs:element name='begindatum' type='xs:dateTime'/>
+      <xs:element name='einddatum' type='xs:dateTime'/>
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Het type van de journaal aantekening.
+  -->
+  <xs:simpleType name='JournaalAantekeningTypeEnum'>
+    <xs:restriction base='xs:string'>
+      <xs:enumeration value='J'/> <!-- Journaal Aanterkening-->
+      <xs:enumeration value='K'/> <!-- Kritische Journaal Aanterkening-->
+      <xs:enumeration value='W'/> <!-- WW Aanterkening-->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--
+  - Message send from OBIweg to OBIcall.
+  - Het bericht waarin de gegevens staan zoals deze door de hulpverlener
+  - zijn gewijzigd of aangevuld. CARE krijgt alle info en bepaalt vervolgens
+  - welke wijzigingen automatisch worden verwerkt. Er kan voor woden gekozen om
+  - sommige verwerkingen handmatig te laten gebeuren. Let wel dat bv.
+  - contract- of lidmaatschapgegens bepalend kunnen zijn voor de wijze van
+  - hulpverlening door de hulpverlener. Resultaat van de complete verwerking
+  - zijn relevant voordat de wegenwacht aan het sleutelen begint.
+  -->
+  <xs:complexType name='completerenIncidentMessage'>
+    <xs:all>
+      <xs:element name='incidentnummer' type='xs:int'/>
+      <xs:element name='hulpverlenernummer' type='xs:int'/>
+      <xs:element name='taak' type='obi:TaakTypeEnum'/>
+      <xs:element name='hulpverlener' type='obi:Wegenwacht' minOccurs='0'/>
+      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
+      <xs:element name='locatie' type='obi:Locatie' minOccurs='0'/>
+      <xs:element name='voertuig' type='Voertuig' minOccurs='0'/>
+      <xs:element name='betaling' type='Betaling' minOccurs='0'/>
+      <xs:element name='arc-ait-gegevens' type='ARC-AIT-Gegevens'
+        minOccurs='0'/>
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Message send from OBIweg to OBIcall.
+  - Met dit bericht kan WEG de pechhistorie van een incidentopvragen
+  - bij CALL. DE pechhistorie bestaat uit de incidenten van de laatste
+  - twaalf maanden behorende bij een lidnummer en/of een kentken die ook
+  - zijn uitgezet bij de WEG-organisatie (dit zijn de sleutelacties bij CARE).
+  -->
+  <xs:complexType name='opvragenPechhistorieMessage'>
+    <xs:all>
+      <xs:element name='kenteken' type='xs:string' minOccurs='0'/>
+      <!-- xs:choice -->
+      <!-- Bij een lid direct het klantLidnummer invullen, bij meerdere leden het wrapper element gebruiken -->
+      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
+      <xs:element name='klantLidnummers' type='KlantLidnummersType' minOccurs='0' />
+      <!-- /xs:choice -->
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Message send from OBIcall to OBIdis.
+  - Het antwoord op een aanvraag van pechhistorie wat kan
+  - bestaan uit de gegevens van enkele incidenten.
+  -->
+  <xs:complexType name='antwoordenPechhistorieMessage'>
+    <xs:all>
+      <xs:element name='pechhistorieLijst' minOccurs='0'>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name='pechhistorie' type='Pechhistorie'
+              minOccurs='0' maxOccurs='unbounded' />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name='Pechhistorie'>
+    <xs:all>
+      <xs:element name='incidentnummer' type='xs:int' />
+      <xs:element name='volgnummer' type='xs:int' />
+      <xs:element name='datum' type='xs:date' />
+      <xs:element name='kenteken' type='xs:string' minOccurs='0'/>
+      <xs:element name='merk' type='xs:string' minOccurs='0' />
+      <xs:element name='pechcode' type='xs:string' />
+      <xs:element name='hulpverlenernummer' type='xs:int' />
+      <xs:element name='mannummer' type='xs:int' />
+      <xs:element name='transport' type='xs:boolean' />
+      <xs:element name='afloopcode' type='xs:int' />
+      <xs:element name='lidnummer' type='xs:int' minOccurs='0' />
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Message send from OBIdis to OBIcall
+  - Met dit bericht kan WEG aan CALL melden of een opdracht
+  - wel of niet succescol is afgehandeld.
+  -->
+  <xs:complexType name='eindemeldenIncidentMessage'>
+    <xs:all>
+      <xs:element name='incidentnummer' type='xs:int' />
+      <!-- actienummer slaat op sleutelhulp en veiligstel gecombineerd -->
+      <xs:element name='actienummer'    type='xs:int' minOccurs='0' />
+      <xs:element name='transportActienummer' type='xs:int' minOccurs='0' />
+
+      <!--OBSOLETE: altijd einde: <element name='incidentstatus' type='obi:IncidentstatusEnum'/-->
+      <xs:element name='afloopcode'     type='obi:AfloopcodeEnum' />
+      <xs:element name='pechcode'       type='xs:int' />
+      <xs:element name='omschrijvingpechcode' type='xs:string' />
+      <!-- Q: Is er altijd WW info beschikbaar? -->
+      <xs:element name='hulpverlener' type='obi:Wegenwacht' />
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Voertuig type t.b.v. completerenIncidentMessage
+  -->
+  <xs:complexType name='Voertuig'>
+    <xs:all>
+      <xs:element name='kenteken' type='xs:string' minOccurs='0' />
+      <xs:element name='merk' type='xs:string' minOccurs='0' />
+      <xs:element name='type' type='xs:string' minOccurs='0'/>
+      <xs:element name='chassisnummer' type='xs:string' minOccurs='0' />
+      <xs:element name='meldcode' type='xs:string' minOccurs='0' />
+      <xs:element name='kilometerstand' type='xs:int' minOccurs='0' />
+      <xs:element name='afgiftedatumKenteken' type='xs:dateTime' minOccurs='0' />
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  <xs:complexType name='Incident'>
+    <xs:all>
+      <xs:element name='incidentnr' type='xs:int' minOccurs='0' />
+      <xs:element name='incidentvolgnr' type='xs:int' minOccurs='0' />
+      <xs:element name='tijdstipRegistratie' type='xs:dateTime' minOccurs='0' />
+      <xs:element name='type' type='xs:int' minOccurs='0' />
+    </xs:all>
+  </xs:complexType>
+  -->
+
+  <!--
+  <xs:complexType name='Klant'>
+    <xs:all>
+      <xs:element name='voornaam' type='xs:string' minOccurs='0'/>
+      <xs:element name='tussenvoegsel' type='xs:string' minOccurs='0'/>
+      <xs:element name='naam' type='xs:string' minOccurs='0'/>
+      <xs:element name='banknummer' type='xs:int' minOccurs='0' />
+      <xs:element name='mailadres' type='xs:string' minOccurs='0' />
+      <xs:element name='straat' type='xs:string' minOccurs='0'/>
+      <xs:element name='huisnr' type='xs:string' minOccurs='0'/>
+      <xs:element name='huisnrAppendix' type='xs:string' minOccurs='0'/>
+      <xs:element name='plaats' type='xs:string' minOccurs='0'/>
+      <xs:element name='postcode' type='xs:string' minOccurs='0'/>
+      <xs:element name='landcode' type='xs:string' minOccurs='0'/>
+    </xs:all>
+  </xs:complexType>
+  -->
+
+  <!--
+  <xs:complexType name="Lidmaatschap">
+    <xs:all>
+      <xs:element name='anwbLidnummer' type='xs:string' minOccurs='0' />
+      <xs:element name='overeenkomstsoort' type='xs:string' minOccurs='0' />
+      <xs:element name='product' type='xs:string' minOccurs='0' />
+    </xs:all>
+  </xs:complexType>
+  -->
+
+  <!--
+  <xs:complexType name='Melder'>
+    <xs:all>
+      <xs:element name='voornaam' type='xs:string' minOccurs='0'/>
+      <xs:element name='tussenvoegsel' type='xs:string' minOccurs='0'/>
+      <xs:element name='naam' type='xs:string' minOccurs='0'/>
+      <xs:element name='telefoon1' type='xs:string' minOccurs='0'/>
+      <xs:element name='telefoon2' type='xs:string' minOccurs='0'/>
+      <xs:element name='beb1' type='xs:boolean' minOccurs='0'/>
+      <xs:element name='beb2' type='xs:boolean' minOccurs='0'/>
+
+      <xs:element name='berijdernaam' type='xs:string' minOccurs='0'/>
+      <xs:element name='berijderIsMelder' type='xs:boolean' minOccurs='0'/>
+      <xs:element name='geboorteDatumBerijder' type='xs:date' minOccurs='0'/>
+      <xs:element name='geslacht' type='xs:string' minOccurs='0'/>
+
+      <-  label waarop is gebeld ->
+      <xs:element name='label' type='xs:string' minOccurs='0'/>
+
+      <xs:element name='straat' type='xs:string' minOccurs='0'/>
+      <xs:element name='huisnr' type='xs:string' minOccurs='0'/>
+      <xs:element name='huisnrAppendix' type='xs:string' minOccurs='0'/>
+      <xs:element name='plaats' type='xs:string' minOccurs='0'/>
+      <xs:element name='postcode' type='xs:string' minOccurs='0'/>
+      <xs:element name='landcode' type='xs:string' minOccurs='0'/>
+    </xs:all>
+  </xs:complexType>
+  -->
+
+  <!--
+  <xs:complexType name='Contract'>
+    <xs:all>
+      <xs:element name='arcid' type='xs:int' minOccurs='0' />
+      <xs:element name='contractNaam' type='xs:string' minOccurs='0' />
+      <xs:element name='contractNummer' type='xs:int' minOccurs='0' />
+      <xs:element name='contractCode' type='xs:int' minOccurs='0' />
+      <xs:element name='contractMaatschappijCode' type='xs:string' minOccurs='0' />
+      <xs:element name='afwentelContractNaam' type='xs:string' minOccurs='0' />
+      <xs:element name='afwentelContractNummer' type='xs:int' minOccurs='0' />
+      <xs:element name='afwentelContractCode' type='xs:int' minOccurs='0' />
+      <xs:element name='afwentelContractMaatschappijCode' type='xs:string' minOccurs='0' />
+    </xs:all>
+  </xs:complexType>
+  -->
+
+  <!--
+  - Gegevens m.b.t. een betaling van een klant aan de hulpverlener.
+  -->
+  <xs:complexType name='Betaling'>
+    <xs:all>
+      <xs:element name='betaald' type='xs:boolean' minOccurs='0' />
+      <xs:element name='bedrag' type='xs:string' minOccurs='0' />
+      <xs:element name='inschrijfgeld' type='xs:boolean' minOccurs='0' />
+      <xs:element name='voorrijkosten' type='xs:boolean' minOccurs='0' />
+      <xs:element name='arbeidsloon' type='xs:boolean' minOccurs='0' />
+      <xs:element name='materiaal' type='xs:boolean' minOccurs='0' />
+      <xs:element name='BetalingWijzeEnum' type='BetalingWijzeEnum' minOccurs='0' />
+    </xs:all>
+  </xs:complexType>
+
+  <xs:simpleType name='BetalingWijzeEnum'>
+    <xs:restriction base='xs:string'>
+      <xs:enumeration value='Contant' />
+      <xs:enumeration value='Creditcard' />
+      <xs:enumeration value='Krediet' />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--
+  - Deze gegevens zijn benodigd voor o.a. helpverlening
+  - aan buitenlanders (zusterclubs).
+  -->
+  <xs:complexType name='ARC-AIT-Gegevens'>
+    <xs:all>
+      <xs:element name='lidnummer' type='xs:string' minOccurs='0'/>
+      <xs:element name='naam' type='xs:string' minOccurs='0'/>
+      <xs:element name='postcode' type='xs:string' minOccurs='0'/>
+      <xs:element name='woonplaats' type='xs:string' minOccurs='0'/>
+      <xs:element name='afgiftedatumKenteken' type='xs:dateTime' minOccurs='0'/>
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - Rijksdriehoekscoordinaten, in meters.
+  -->
+  <!--
+  <xs:complexType name='Coordinaat'>
+    <xs:all>
+      <xs:element name='x' type='xs:long' />
+      <xs:element name='y' type='xs:long' />
+    </xs:all>
+  </xs:complexType>
+  -->
+
+  <xs:simpleType name='StatusEnum'>
+    <xs:restriction base='xs:string'>
+      <xs:enumeration value='open'/>
+      <xs:enumeration value='verzonden'/> <!--verzonden aan hv -->
+      <xs:enumeration value='aanrijden'/> <!--geaccepteerd door hv -->
+      <xs:enumeration value='uitvoeren'/>
+      <xs:enumeration value='einde'/>
+      <xs:enumeration value='geannuleerd'/> <!-- taak geannuleerd -->
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+

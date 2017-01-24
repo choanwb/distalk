@@ -62,11 +62,18 @@ class DisJmsService {
     }
 
     def sendJmsMessage(def message, String sendQueue) {
+        log.debug("Sending ${message} to ${sendQueue}")
         validation = grailsApplication.config.getProperty("validation", Boolean)
         def process = grailsApplication.config.getProperty("disel.proces")
         def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
         jmsService.send(queue:(sendQueue), jmsMessage) { Message msg ->
             msg.setStringProperty("PROCES", process)
         }
+        log.info("Message sent to ${sendQueue}")
+    }
+
+    def receiveJmsMessage(String receiveQueue) {
+        def reply = jmsService.receiveSelected(receiveQueue, null)
+        reply
     }
 }

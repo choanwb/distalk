@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="http://anwb.org/hv/alcincident"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:call="http://anwb.org/hv/ict/oxi/callinc"
+             xmlns:tns="http://anwb.org/hv/alcincident"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema">
+      <import namespace="http://anwb.org/hv/ict/oxi/callinc" schemaLocation="CallIncident.xsd"/>
+      <import namespace="http://anwb.org/hv/ict/oxi/obi" schemaLocation="Obi.xsd"/>
+    </schema>
+  </types>
+  <message name="TeruggevenIncidentMessage">
+    <part name="message" type="call:teruggevenIncidentMessage" />
+  </message>
+  <message name="MeldenStatusMessage">
+    <part name="message" type="call:meldenStatusMessage" />
+  </message>
+  <message name="CompleterenIncidentMessage">
+    <part name="message" type="call:completerenIncidentMessage" />
+  </message>
+  <message name="EindemeldenIncidentMessage">
+    <part name="message" type="call:eindemeldenIncidentMessage" />
+  </message>
+
+  <portType name="AlcIncident">
+    <operation name="teruggevenIncident">
+      <input message="tns:TeruggevenIncidentMessage"/>
+    </operation>
+    <operation name="meldenStatus">
+      <input message="tns:MeldenStatusMessage"/>
+    </operation>
+    <operation name="completerenIncident">
+      <input message="tns:CompleterenIncidentMessage"/>
+    </operation>
+    <operation name="eindemeldenIncident">
+      <input message="tns:EindemeldenIncidentMessage"/>
+    </operation>
+  </portType>
+
+  <binding name="AlcIncidentBinding" type="tns:AlcIncident">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="teruggevenIncident">
+      <soap:operation soapAction="teruggevenIncident"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="meldenStatus">
+      <soap:operation soapAction="meldenStatus"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="completerenIncident">
+      <soap:operation soapAction="completerenIncident"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="eindemeldenIncident">
+      <soap:operation soapAction="eindemeldenIncident"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+  </binding>
+
+  <service name="AlcIncidentService">
+    <port name="AlcIncidentPort" binding="tns:AlcIncidentBinding">
+      <soap:address
+          location="http://localhost/alcincident/" />
+    </port>
+  </service>
+</definitions>

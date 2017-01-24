@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+- Messages die de ANWB/Dis naar LogicX stuurt (ongeacht of dit mededelingen,
+- aanvragen, of antwoorden zijn).
+- 
+- LET OP: Ontvangers van deze berichten worden geacht deze bij het
+- inlezen (parsen) te valideren aan de hand van _dit_ schema, en moeten als
+- het XML bericht niet volledig fout- en waarschuwingsvrij parsed dit XML
+- bericht als ongeldig terzijde leggen en een FoutBericht terug sturen.
+-
+- In de XML instanties moeten alle waarden van het type xs:timeDate
+- voorzien zijn van of de 'Z' (zulu) timezone indicatie of van een timezone
+- offset van 0. Dwz alle tijden zijn in UTC of GMT.
+-
+- Lepels (eigenlijk de man-voertuig inzet-combinaties) worden geidentificeerd
+- met het kenteken van de lepel.
+-->
+
+
+<xs:schema
+  targetNamespace='http://anwb.org/hv/ict/dis-logicx-11.0'
+  xmlns='http://anwb.org/hv/ict/dis-logicx-11.0'
+  xmlns:xs='http://www.w3.org/2001/XMLSchema'
+  elementFormDefault='qualified'>
+  
+  <!--
+  - Status Lepelwagen bericht. Via dit bericht wordt LogicX geinformeerd
+  - over de beschikbaarheid/onbeschikbaarheid van Lepels.
+  -
+  - De indentificatie van een lepel, dat eigenlijk een man-voertuig inzet-
+  - eenheid is, loopt via het kenteken.
+  -
+  - Indien de lepel beschikbaar gesteld wordt (beschikbaar='true') dan
+  - volgt kort na dit status bericht een eerste LepelLocatie bericht. 
+  -
+  -->
+   <xs:element name='LepelBeschikbaar'>
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Bericht id. -->
+        <xs:element name='berichtnummer' type='xs:int'/>
+        
+        <!-- Identificatie van de lepel. -->
+        <xs:element name='kenteken' type='xs:string'/>
+        
+        <!-- Mannummer van de hulpverlener. -->
+        <xs:element name='mannummer' type='xs:int'/>
+        
+        <!-- Voornaam van de hulpverlener -->
+        <xs:element name='voornaam' type='xs:string'/>
+        
+        <!-- Achternaam van de hulpverlener -->
+        <xs:element name='achternaam' type='xs:string'/>
+        
+        <!-- Personeelsnummer van de hulpverlener? -->
+        <xs:element name='personeelsnummer' type='xs:int'/>
+        
+        <!-- Het (GRIP) telefoonnummer van de hulpverlener. -->
+        <xs:element name='gripnummer' type='xs:string'/>
+
+        <!-- einde dienst tijd van de lepel chauffeur -->
+        <xs:element name='eindeDienst' type='xs:dateTime'/>
+        
+        <!-- (X,Y) stallingslocatie in meters in het Rijksdriehoek stelsel -->
+        <xs:element name='stalX' type='xs:long' />
+        <xs:element name='stalY' type='xs:long' />
+
+        <!-- (X,Y) actuele locatie in meters in het Rijksdriehoek stelsel -->
+        <xs:element name='X' type='xs:long' />
+        <xs:element name='Y' type='xs:long' />
+        
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name='LepelNietBeschikbaar'>
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Bericht id. -->
+        <xs:element name='berichtnummer' type='xs:int'/>
+        
+        <!-- Identificatie van de lepel. -->
+        <xs:element name='kenteken' type='xs:string'/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!--
+  - GPS bericht lepelwagens.
+  - Voor beschikbaar gestelde en in opdracht van LogicX uitvoerende lepels
+  - ontvangt LogicX locatie gegevens. 
+  -
+  - Van ANWB/OBIdis naar LogicX.
+  - Specificatie: bericht 7.0.
+  - NB: Dit bericht is helemaal uitgekleed omdat de lepel status (ex locatie)
+  - verplaats is naar het nieuwe <LepelStatus> bericht.
+  -->
+  <xs:element name='LepelLocatie'>
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Bericht id. -->
+        <xs:element name='berichtnummer' type='xs:int'/>
+        
+        <!-- Identificatie van de lepel. -->
+        <xs:element name='mannummer' type='xs:int'/>
+        
+        <!-- Lepel beschikbaar voor Logicx? -->
+        <xs:element name='beschikbaar' type='xs:boolean'/>
+        
+        <!-- (X,Y) locatie in meters in het Rijksdriehoek stelsel -->
+        <xs:element name='X' type='xs:long' minOccurs='0'/>
+        <xs:element name='Y' type='xs:long' minOccurs='0'/>
+        <!-- (Lat, Long) locatie -->
+        <xs:element name='lat' type='xs:double' minOccurs='0'/>
+        <xs:element name='long' type='xs:double' minOccurs='0'/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!--
+    FoutBericht dat doorspatch naar Logicx gestuurd wordt 
+    als een binnenkomend bericht om wat voor reden dan ook niet
+    verwerkt kan worden. De reden kan in het element 'melding' gezet worden,
+    eventueel het betreffende bericht als een CDATA blok in offendingMessage
+  -->
+  <xs:element name='FoutBericht'>
+    <xs:complexType>
+      <xs:all>
+        <!-- Bericht ID. -->
+        <xs:element name='berichtnummer' type='xs:int'/>
+
+        <xs:element name="melding" type="xs:string" />
+        <xs:element name="offendingMessage" type="xs:string" minOccurs='0'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <!--
+  - Dit bericht wordt gestuurd als alle lepels in 1 klap
+  - niet-beschikbaar gemaakt moeten worden. Dit kan b.v. gebeuren als
+  -     Dispatch gecontroleerd down gaat
+  -     Dispatch opstart, waarna alle beschikbare Lepels aangemeld worden
+  -     (deze laatste om alles goed te laten lopen als Dispatch crashed
+  - de reden is verplicht, zodat Logicx planners weten wat er aan de hand is
+  --> 
+  <xs:element name='AlleLepelsNietBeschikbaar'>
+    <xs:complexType>
+      <xs:all>
+        <!-- Bericht id. -->
+        <xs:element name='berichtnummer' type='xs:int'/>
+        <!-- reden waarom -->
+        <xs:element name='reden' type='xs:string'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+

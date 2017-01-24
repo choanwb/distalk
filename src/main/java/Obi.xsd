@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+- Een collectie van type definities waarna vanuit verschillende
+- andere schema's gerefereerd wordt.
+-->
+<xs:schema xmlns="http://anwb.org/hv/ict/oxi/obi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://anwb.org/hv/ict/oxi/obi">
+
+
+  <xs:complexType name="LocatieIndicatie">
+    <xs:choice>
+      <xs:element minOccurs="0" name="adres" type="Adres"/>
+      <xs:element minOccurs="0" name="kruising" type="Kruising"/>
+      <xs:element minOccurs="0" name="hectometerpaal" type="Hectometerpaal"/>
+      <xs:element minOccurs="0" name="postcode" type="PostcodeHuisnummer"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="Klant">
+    <xs:all>
+      <xs:element minOccurs="0" name="naam" type="xs:string"/>
+      <xs:element minOccurs="0" name="voorletters" type="xs:string"/>
+      <xs:element minOccurs="0" name="tussenvoegsel" type="xs:string"/>
+      <xs:element minOccurs="0" name="achternaam" type="xs:string"/>
+      <xs:element minOccurs="0" name="adres" type="Adres"/>
+      <xs:element minOccurs="0" name="postcode" type="xs:string"/>
+      <xs:element minOccurs="0" name="lidsoort" type="xs:string"/>
+      <xs:element minOccurs="0" name="productcode" type="xs:string"/>
+      <!-- RSH: wat is de zin van een bolean contract ?? -->
+      <xs:element minOccurs="0" name="contract" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="type_contract" type="xs:int"/>
+      <!-- hierin komt de volledige naam van het contract of de zusterclub -->
+      <xs:element minOccurs="0" name="naam_contract" type="xs:string"/>
+      <!-- hierin komt de maatschappij code of de afkorting van de zusterclub -->
+      <xs:element minOccurs="0" name="maatschappij_code" type="xs:string"/>
+      <xs:element minOccurs="0" name="contract_id" type="xs:string"/>
+      <xs:element minOccurs="0" name="contract_versie" type="xs:string"/>
+
+      <xs:element name='rechten' type='Rechten' minOccurs='0'/>
+    </xs:all>
+    <xs:attribute name="typeKlant" type="TypeKlant" />
+    <xs:attribute name="lidnummer" type="xs:int" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="TypeKlant">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RECHTGEVEND" />
+      <xs:enumeration value="GEZINSLID" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="JournaalAantekening">
+    <xs:all>
+      <xs:element name="inhoud" type="xs:string"/>
+      <xs:element minOccurs="0" name="lidnummer" type="xs:int"/>
+      <xs:element minOccurs="0" name="kenteken" type="xs:string"/>
+      <xs:element name="code" type="xs:string"/>
+      <xs:element name="type" type="JournaalAantekeningTypeEnum"/>
+      <xs:element name="begindatum" type="xs:dateTime"/>
+      <xs:element name="einddatum" type="xs:dateTime"/>
+    </xs:all>
+  </xs:complexType>
+
+  <!--
+  - De Types Journaal aantekening.
+  -->
+  <xs:simpleType name="JournaalAantekeningTypeEnum">
+    <xs:restriction base="xs:string">
+<!--
+QUESTION: Waarom niet zelf-beschrijvende codes i.p.v. die
+kryptische 'J', 'K', en 'W'? Het commentaar er achter geeft al aan dat
+die eenletter codes niet erg duidelijk zijn.
+-->
+      <xs:enumeration value="J"/> <!-- Journaal Aantekening-->
+      <xs:enumeration value="K"/> <!-- Kritische Journaal Aantekening-->
+      <xs:enumeration value="W"/> <!-- WW Aantekening-->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="GeslachtTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="M"/>
+      <xs:enumeration value="V"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Voertuig">
+    <xs:all>
+      <xs:element minOccurs="0" name="merk" type="xs:string"/>
+      <xs:element minOccurs="0" name="type" type="xs:string"/>
+      <xs:element minOccurs="0" name="truck" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="soort" type="xs:string"/>
+      <xs:element minOccurs="0" name="brandstof" type="xs:string"/>
+      <xs:element minOccurs="0" name="kenteken" type="xs:string"/>
+      <xs:element minOccurs="0" name="kleur" type="xs:string"/>
+      <xs:element minOccurs="0" name="nationaliteit" type="xs:string"/>
+      <xs:element minOccurs="0" name="chassisnummer" type="xs:string"/>
+      <xs:element minOccurs="0" name="controlerechten" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="afgiftekenteken" type="xs:dateTime"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Rechten">
+    <xs:all>
+      <xs:element minOccurs="0" name="inschrijfcode" type="xs:string"/>
+      <!-- inschrijftarief in euro's -->
+      <xs:element minOccurs="0" name="inschrijftarief" type="xs:float"/>
+      <xs:element minOccurs="0" name="betaald" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="wps" type="xs:int"/>
+      <xs:element minOccurs="0" name="sleep" type="xs:int"/>
+      <xs:element minOccurs="0" name="vas" type="xs:int"/>
+      <xs:element minOccurs="0" name="vasduur" type="xs:string"/> <!-- max 5 chars -->
+      <xs:element minOccurs="0" name="krediet" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="hulpverlening" type="xs:int"/>
+      <xs:element minOccurs="0" name="kenteken" type="xs:int"/>
+      <xs:element minOccurs="0" name="asmToegestaan" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="haalEnBreng" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="hotel" type="xs:boolean"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Melder">
+    <xs:all>
+      <xs:element name="naam" type="xs:string"/>
+      <xs:element minOccurs="0" name="benErBijna" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="telefoonnummer" type="xs:string"/>
+      <xs:element minOccurs="0" name="naamBerijder" type="xs:string"/>
+      <xs:element minOccurs="0" name="geslacht" type="GeslachtTypeEnum"/>
+   </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Opdracht">
+    <xs:all>
+      <!-- Q: Moet dit element niet verplicht zijn? -->
+      <xs:element minOccurs="0" name="hulpverlenernummer" type="xs:int"/>
+    </xs:all>
+
+    <xs:attribute name="opdrachtvolgnummer" type="xs:byte" use="required"/>
+    <xs:attribute name="incidentnummer" type="xs:int" use="required"/>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Locatie">
+    <xs:all>
+      <xs:element minOccurs="0" name="bijzonderheid" type="xs:string"/>
+      <xs:element minOccurs="0" name="locatieMelding" type="Locatiemelding"/>
+      <xs:element minOccurs="0" name="wegtype" type="WegtypeEnum"/>
+    </xs:all>
+    <xs:attribute name="x" type="xs:long" use="required"/>
+    <xs:attribute name="y" type="xs:long" use="required"/>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Kruising">
+    <xs:all>
+      <xs:element name="plaats" type="xs:string"/>
+      <xs:element name="straat" type="xs:string"/>
+      <xs:element name="kruisendeStraat" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Hectometerpaal">
+    <xs:all>
+      <xs:element name="wegnummer" type="xs:string"/>
+      <xs:element name="nummer" type="xs:string"/>
+      <xs:element minOccurs="0" name="richting" type="RichtingEnum"/>
+      <xs:element name="plaatsVan" type="xs:string"/>
+      <xs:element name="plaatsNaar" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Adres">
+    <xs:all>
+      <xs:element name="plaats" type="xs:string"/>
+      <xs:element name="straat" type="xs:string"/>
+      <xs:element name="huisnummer" type="Huisnummer"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="PostcodeHuisnummer">
+    <xs:all>
+      <xs:element name="postcode" type="xs:string"/>
+      <xs:element name="huisnummer" type="Huisnummer"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Markering">
+    <xs:all>
+      <xs:element name="type" type="MarkeringTypeEnum"/>
+      <xs:element name="locatieIndicatie" type="LocatieIndicatie"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Praatpaal">
+    <xs:attribute name="nummer" type="xs:int" use="required"/>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Huisnummer">
+    <xs:all>
+      <xs:element name="nummer" type="xs:int"/>
+      <xs:element minOccurs="0" name="appendix" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="Locatiemelding">
+    <xs:all>
+      <xs:element minOccurs="0" name="viaPraatpaal" type="LocatieMeldingViaPraatpaal"/>
+      <xs:element name="locatieIndicatie" type="LocatieIndicatie"/>
+      <xs:element minOccurs="0" name="viaMarkering" type="Markering"/>
+    </xs:all>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="LocatieMeldingViaPraatpaal">
+    <xs:all>
+      <xs:element name="richtingTotPraatpaal" type="RichtingTotPraatpaalEnum"/>
+      <xs:element name="afstandTotPraatpaal" type="xs:int"/>
+      <xs:element name="praatpaal" type="Praatpaal"/>
+    </xs:all>
+  </xs:complexType>
+
+
+  <xs:complexType name="Wegenwacht">
+    <xs:all>
+      <xs:element name="hulpverlenernummer" type="xs:int"/>
+      <xs:element minOccurs="0" name="gripnummer" type="xs:string"/>
+      <xs:element minOccurs="0" name="telefoonnummer" type="xs:string"/>
+      <xs:element minOccurs="0" name="mannummer" type="xs:int"/>
+      <xs:element minOccurs="0" name="voornaam" type="xs:string"/>
+      <xs:element minOccurs="0" name="achternaam" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:element name="resultaatBericht" type="ResultaatType"/>
+
+  <xs:complexType name="ResultaatType">
+    <xs:all>
+      <xs:element minOccurs="0" name="omschrijving" type="xs:string"/>
+    </xs:all>
+    <xs:attribute name="code" type="ResultaatEnum" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="Foutmelding">
+    <xs:all>
+      <xs:element minOccurs="0" name="omschrijving" type="xs:string"/>
+    </xs:all>
+    <xs:attribute name="code" type="FoutcodeEnum" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="RichtingEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Li"/>
+      <xs:enumeration value="Re"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RichtingTotPraatpaalEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Verder"/>
+      <xs:enumeration value="Terug"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="VoertuigsoortEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Personenauto"/>
+      <xs:enumeration value="Truck"/>
+      <xs:enumeration value="Motorfiets"/>
+      <xs:enumeration value="Bus"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="BrandstofEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LPG"/>
+      <xs:enumeration value="Diesel"/>
+      <xs:enumeration value="Benzine"/>
+      <xs:enumeration value="Elektrisch"/>
+      <xs:enumeration value="Anders"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="IncidentstatusEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Open"/>
+      <xs:enumeration value="InPlanning"/>
+      <xs:enumeration value="InBehandeling"/>
+      <xs:enumeration value="Afgehandeld"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="PlanningsmethodeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Handmatig"/>
+      <xs:enumeration value="Automatisch"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="WegtypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Snelweg"/>
+      <!-- parkeerplats cq benzinepomp: -->
+      <xs:enumeration value="PPL aan Snelweg"/>
+      <xs:enumeration value="Autoweg"/>
+      <xs:enumeration value="Overig"/>
+      <xs:enumeration value="Locale Weg"/>
+      <xs:enumeration value="PPL aan Locale Weg"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="HVVoertuigsoortEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Lepel"/>
+      <xs:enumeration value="Motorfiets"/>
+      <xs:enumeration value="Personenauto"/>
+      <xs:enumeration value="Truckservice"/>
+      <xs:enumeration value="Bus"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+  <xs:simpleType name="FoutcodeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OK"/>
+      <xs:enumeration value="OngeldigBericht"/>
+      <xs:enumeration value="OnbruikbaarBericht"/>
+      <xs:enumeration value="Warning"/>
+      <xs:enumeration value="Error"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResultaatEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OK"/>
+      <xs:enumeration value="Warning"/>
+      <xs:enumeration value="Error"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:simpleType name="MarkeringTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AfEnToeritten"/>
+      <xs:enumeration value="Benzinestation"/>
+      <xs:enumeration value="Firma"/>
+      <xs:enumeration value="Gebouwen"/>
+      <xs:enumeration value="Haven"/>
+      <xs:enumeration value="Horeca"/>
+      <xs:enumeration value="Parkeerplaatsen"/>
+      <xs:enumeration value="Recreatie"/>
+      <xs:enumeration value="Sportgelegenheden"/>
+      <xs:enumeration value="Telefooncellen"/>
+      <xs:enumeration value="Vliegvelden"/>
+      <xs:enumeration value="VanNaar"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:simpleType name="AfloopcodeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NietGeholpen"/>
+      <xs:enumeration value="Geslaagd"/>
+      <xs:enumeration value="MetBerekendRisico"/>
+      <xs:enumeration value="OnderVoorwaarden"/>
+      <xs:enumeration value="RijdenAfgeraden"/>
+      <xs:enumeration value="Afgewezen"/>
+      <xs:enumeration value="WegenwachtSleep"/>
+      <xs:enumeration value="TransportOpVerzoekMeldkamer"/>
+      <xs:enumeration value="Veiliggesteld en Geslaagd"/>
+      <xs:enumeration value="Hulpverlenen sleep"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--
+  Deze gegevens zijn benodigd voor het onderscheiden van de type inzet
+  -->
+
+  <xs:simpleType name="TaakTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Lepel"/>
+      <xs:enumeration value="Sleutel"/>
+      <xs:enumeration value="Transport"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+</xs:schema>

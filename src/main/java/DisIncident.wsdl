@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="http://anwb.org/hv/disincident"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:dis="http://anwb.org/hv/ict/oxi/disinc"
+             xmlns:tns="http://anwb.org/hv/disincident"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema">
+      <import namespace="http://anwb.org/hv/ict/oxi/disinc" schemaLocation="disincident.xsd"/>
+      <import namespace="http://anwb.org/hv/ict/oxi/obi" schemaLocation="Obi.xsd"/>
+    </schema>
+  </types>
+  <message name="AanmeldenIncidentMessage">
+    <part name="message" type="dis:aanmeldenIncidentMessage" />
+  </message>
+  <message name="WijzigenIncidentMessage">
+    <part name="message" type="dis:wijzigenIncidentMessage" />
+  </message>
+  <message name="AfmeldenIncidentMessage">
+    <part name="message" type="dis:afmeldenIncidentMessage" />
+  </message>
+  <message name="OpvragenPlanningsInfoMessage">
+    <part name="message" type="dis:opvragenPlanningsinfoMessage" />
+  </message>
+  <message name="AntwoordenPlanningsInfoMessage">
+    <part name="message" type="dis:antwoordenPlanningsinfoMessage" />
+  </message>
+  <message name="OpvragenOpdrachtInfoMessage">
+    <part name="message" type="dis:opvragenOpdrachtinfoMessage" />
+  </message>
+  <message name="AntwoordenOpdrachtInfoMessage">
+    <part name="message" type="dis:antwoordenOpdrachtinfoMessage" />
+  </message>
+
+  <portType name="DisIncident">
+    <operation name="aanmeldenIncident">
+      <input message="tns:AanmeldenIncidentMessage"/>
+    </operation>
+    <operation name="wijzigenIncident">
+      <input message="tns:WijzigenIncidentMessage"/>
+    </operation>
+    <operation name="afmeldenIncident">
+      <input message="tns:AfmeldenIncidentMessage"/>
+    </operation>
+    <operation name="opvragenPlanningsInfo">
+      <input message="tns:OpvragenPlanningsInfoMessage"/>
+      <output message="tns:AntwoordenPlanningsInfoMessage"/>
+    </operation>
+    <operation name="opvragenOpdrachtInfo">
+      <input message="tns:OpvragenOpdrachtInfoMessage"/>
+      <output message="tns:AntwoordenOpdrachtInfoMessage"/>
+    </operation>
+  </portType>
+
+  <binding name="DisIncidentBinding" type="tns:DisIncident">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="aanmeldenIncident">
+      <soap:operation soapAction="aanmeldenIncident"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="wijzigenIncident">
+      <soap:operation soapAction="wijzigenIncident"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="afmeldenIncident">
+      <soap:operation soapAction="afmeldenIncident"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="opvragenPlanningsInfo">
+      <soap:operation soapAction="opvragenPlanningsInfo"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+    <operation name="opvragenOpdrachtInfo">
+      <soap:operation soapAction="opvragenOpdrachtInfo"/>
+      <input>
+        <soap:body
+            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            namespace="urn:anwb:disservice"
+            use="encoded"/>
+      </input>
+    </operation>
+  </binding>
+
+  <service name="DisIncidentService">
+    <port name="DisIncidentPort" binding="tns:DisIncidentBinding">
+      <soap:address
+          location="http://localhost/disincident/" />
+    </port>
+  </service>
+</definitions>

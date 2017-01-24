@@ -27,6 +27,11 @@ jms:
 
 validation: false
 
+#naam waaronder de services beschikbaar zijn
+cxf:
+    servlet:
+        mapping: /disservices/*
+
 environments:
     development:
         dataSource:
