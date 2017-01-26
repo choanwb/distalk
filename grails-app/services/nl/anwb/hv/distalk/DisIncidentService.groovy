@@ -28,15 +28,21 @@ class DisIncidentService {
 
     @WebMethod
     @WebResult
-    AntwoordenPlanningsinfoMessage opvragenPlanningsInfo(OpvragenPlanningsinfoMessage message){}
+    AntwoordenPlanningsinfoMessage opvragenPlanningsInfo(OpvragenPlanningsinfoMessage message){
+        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.sendQueue"))
+    }
 
     @WebMethod
     @WebResult
-    AntwoordenOpdrachtinfoMessage opvragenOpdrachtInfo(OpvragenOpdrachtinfoMessage message){}
+    AntwoordenOpdrachtinfoMessage opvragenOpdrachtInfo(OpvragenOpdrachtinfoMessage message){
+        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.sendQueue"))
+    }
 
     @WebMethod
     @WebResult
-    void wijzigenIncident(WijzigenIncidentMessage message){}
+    void wijzigenIncident(WijzigenIncidentMessage message){
+        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.sendQueue"))
+    }
 
     @WebMethod
     @WebResult
