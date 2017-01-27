@@ -32,8 +32,14 @@
   <message name="AntwoordenOpdrachtInfoMessage">
     <part name="message" type="dis:antwoordenOpdrachtinfoMessage" />
   </message>
+  <message name="TestMethodMessage">
+    <part name="hallo" type="xsd:string"/>
+  </message>
 
   <portType name="DisIncident">
+    <operation name="testMethod">
+      <input message="tns:TestMethodMessage"/>
+    </operation>
     <operation name="aanmeldenIncident">
       <input message="tns:AanmeldenIncidentMessage"/>
     </operation>
@@ -56,13 +62,22 @@
   <binding name="DisIncidentBinding" type="tns:DisIncident">
     <soap:binding style="document"
                   transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="testMethod">
+      <soap:operation soapAction="testMethod"/>
+      <input>
+        <soap:body
+                encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                namespace="urn:anwb:disservice"
+                use="encoded"/>
+      </input>
+    </operation>
     <operation name="aanmeldenIncident">
       <soap:operation soapAction="aanmeldenIncident"/>
       <input>
         <soap:body
-            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-            namespace="urn:anwb:disservice"
-            use="encoded"/>
+                encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                namespace="urn:anwb:disservice"
+                use="encoded"/>
       </input>
     </operation>
     <operation name="wijzigenIncident">
@@ -106,7 +121,7 @@
   <service name="DisIncidentService">
     <port name="DisIncidentPort" binding="tns:DisIncidentBinding">
       <soap:address
-          location="http://localhost/disincident/" />
+          location="http://localhost:8080/disservices/disincident/" />
     </port>
   </service>
 </definitions>

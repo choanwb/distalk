@@ -8,16 +8,19 @@ import org.anwb.hv.ict.oxi.disinc.AntwoordenPlanningsinfoMessage
 import org.anwb.hv.ict.oxi.disinc.OpvragenOpdrachtinfoMessage
 import org.anwb.hv.ict.oxi.disinc.OpvragenPlanningsinfoMessage
 import org.anwb.hv.ict.oxi.disinc.WijzigenIncidentMessage
+import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 
 import javax.jws.WebMethod
 import javax.jws.WebResult
 
 @Transactional
-@GrailsCxfEndpoint
+@GrailsCxfEndpoint(name ='DisIncidentService')
 class DisIncidentService {
     def disJmsService
     def grailsApplication
+
+
 
 
     @WebMethod
@@ -46,5 +49,13 @@ class DisIncidentService {
 
     @WebMethod
     @WebResult
-    void afmeldenIncident(AfmeldenIncidentMessage message){}
+    void afmeldenIncident(AfmeldenIncidentMessage message){
+        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.sendQueue"))
+    }
+
+    @WebMethod
+    @WebResult
+    void testMethod(String hallo){
+        println("reached code: ${hallo}")
+    }
 }

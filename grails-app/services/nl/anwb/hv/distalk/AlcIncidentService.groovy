@@ -12,7 +12,7 @@ import javax.jws.WebMethod
 import javax.jws.WebResult
 
 @Transactional
-@GrailsCxfEndpoint
+@GrailsCxfEndpoint(name ='AlcIncidentService')
 class AlcIncidentService {
 
     @WebMethod

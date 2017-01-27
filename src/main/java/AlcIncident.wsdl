@@ -83,7 +83,7 @@
   <service name="AlcIncidentService">
     <port name="AlcIncidentPort" binding="tns:AlcIncidentBinding">
       <soap:address
-          location="http://localhost/alcincident/" />
+          location="http://localhost:8080/disservices/alcincident/" />
     </port>
   </service>
 </definitions>
