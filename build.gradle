@@ -77,6 +77,7 @@ dependencies {
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
     compile "nl.anwb.hv.oxi3:oxi3util:2.1.0.1"
     compile "nl.anwb.hv.oxi3:oxi-disinc:17.0"
+    compile "nl.anwb.hv.oxi3:oxi-callinc:19.0"
     compile "com.sonicsoftware.sonicmq:sonic_Client:${sonicVersion}"
     compile "com.sonicsoftware.sonicmq:sonic_Crypto:${sonicVersion}"
     compile "com.sonicsoftware.sonicmq:mfcontext:${sonicVersion}"
