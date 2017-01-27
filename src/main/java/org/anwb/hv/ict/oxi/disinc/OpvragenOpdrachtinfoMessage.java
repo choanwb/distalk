@@ -1,10 +1,7 @@
 
 package org.anwb.hv.ict.oxi.disinc;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -27,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "opvragenOpdrachtinfoMessage")
+@XmlRootElement(name = "opvragenOpdrachtinfoMessage")
 public class OpvragenOpdrachtinfoMessage {
 
     @XmlAttribute(name = "incidentnummer", required = true)

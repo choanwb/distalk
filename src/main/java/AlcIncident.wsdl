@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions targetNamespace="http://anwb.org/hv/alcincident"
+<definitions targetNamespace="http://distalk.hv.anwb.nl/"
              xmlns="http://schemas.xmlsoap.org/wsdl/"
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
              xmlns:call="http://anwb.org/hv/ict/oxi/callinc"
-             xmlns:tns="http://anwb.org/hv/alcincident"
+             xmlns:tns="http://distalk.hv.anwb.nl/"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <types>
     <schema xmlns="http://www.w3.org/2001/XMLSchema">
