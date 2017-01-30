@@ -87,4 +87,9 @@ class SendJmsController {
         disJmsService.sendJmsMessage(new AanmeldenIncidentMessage(), grailsApplication.config.getProperty("disel.sendQueue"))
         redirect(uri:'/')
     }
+
+    def receiveMessage() {
+        disJmsService.receiveJmsMessage("anwb.hv.binnenland.dispatch.disToLogicxQueue.Chi")
+        redirect(uri:'/')
+    }
 }

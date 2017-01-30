@@ -19,6 +19,10 @@ disel:
     timeout: 10
     proces: DEV_CHI
 
+logicx:
+    destination: anwb.hv.binnenland.dispatch.disToLogicxQueue
+app.name: anwb.hv.binnenland.dispatch.disToLogicxQueue
+
 
 jms:
     broker: tcp://dhglx1003:2523
