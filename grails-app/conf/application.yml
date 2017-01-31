@@ -28,8 +28,16 @@ jms:
     broker: tcp://dhglx1003:2523
     user: DISPATCH_USER
     passwd: DISPATCH_PWD
+    validation: false
 
-validation: false
+bizztalk:
+    url: http://localhost:8080/blabla
+    user: chi
+    password: pw
+    source:
+    connectTimeout: 5000
+    readTimeout: 5000
+    nosend: true
 
 #naam waaronder de services beschikbaar zijn
 cxf:

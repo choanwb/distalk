@@ -11,6 +11,7 @@ import javax.jms.Message
 @Transactional
 class DisJmsService {
     def jmsService
+    def alcIncidentService
     def grailsApplication
     static exposes = ["jms"]
     static isTopic = Boolean.FALSE
@@ -19,7 +20,7 @@ class DisJmsService {
 
     def sendJmsMessage(def message, String sendQueue) {
         log.debug("Sending ${message} to ${sendQueue}")
-        validation = grailsApplication.config.getProperty("validation", Boolean)
+        validation = grailsApplication.config.getProperty("jms.validation", Boolean)
         def process = grailsApplication.config.getProperty("disel.proces")
         def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
         jmsService.send(queue:(sendQueue), jmsMessage) { Message msg ->
@@ -28,6 +29,8 @@ class DisJmsService {
         log.info("Message sent to ${sendQueue}")
     }
 
+    //TODO selectors? target = LOGICX
+
     def receiveJmsMessage(String receiveQueue) {
         def reply = jmsService.receiveSelected(receiveQueue, null)
         println("reply: ${reply}")
@@ -35,6 +38,7 @@ class DisJmsService {
     }
 
     def onMessage(msg) {
-        println("msg: ${msg}")
+        log.info(msg)
+        alcIncidentService.process(msg)
     }
 }

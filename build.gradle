@@ -66,7 +66,6 @@ dependencies {
     compile 'org.grails.plugins:wslite:1.0.0.BUILD-SNAPSHOT'
     compile 'org.grails.plugins:jms:2.0.0.M1'
     compile 'org.grails.plugins:cxf:3.1.0'
-    compile 'org.grails.plugins:grails-cxf-client:3.0.3'
     console "org.grails:grails-console"
     profile "org.grails.profiles:web"
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.8.2"
@@ -75,14 +74,19 @@ dependencies {
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
-    compile "nl.anwb.hv.oxi3:oxi3util:2.1.0.1"
+    compile "nl.anwb.hv.oxi3:oxi3util:2.2.0.1"
     compile "nl.anwb.hv.oxi3:oxi-disinc:17.0"
     compile "nl.anwb.hv.oxi3:oxi-logicx-dis:13.1-SNAPSHOT"
-//    compile "nl.anwb.hv.oxi3:oxi-dis-logicx:11.1"
-//    compile "nl.anwb.hv.oxi3:oxi-callinc:19.0"
+    compile "nl.anwb.hv.oxi3:oxi-dis-logicx:11.1"
+    compile "nl.anwb.hv.oxi3:oxi-callinc:19.0"
+    compile "org.grails.plugins:wslite:1.0.0.BUILD-SNAPSHOT"
     compile "com.sonicsoftware.sonicmq:sonic_Client:${sonicVersion}"
     compile "com.sonicsoftware.sonicmq:sonic_Crypto:${sonicVersion}"
     compile "com.sonicsoftware.sonicmq:mfcontext:${sonicVersion}"
+}
+
+grails {
+    pathingJar = true
 }
 
 assets {
