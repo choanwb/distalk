@@ -83,6 +83,7 @@ dependencies {
     compile "com.sonicsoftware.sonicmq:sonic_Client:${sonicVersion}"
     compile "com.sonicsoftware.sonicmq:sonic_Crypto:${sonicVersion}"
     compile "com.sonicsoftware.sonicmq:mfcontext:${sonicVersion}"
+    compile 'ch.qos.logback:logback-classic:1.1.5'
 }
 
 grails {

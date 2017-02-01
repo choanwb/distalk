@@ -44,6 +44,9 @@ cxf:
     servlet:
         mapping: /disservices/*
 
+logging:
+    config: grails-app/conf/logback.groovy
+
 environments:
     development:
         dataSource:

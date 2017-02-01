@@ -16,7 +16,7 @@ class AlcIncidentService {
     def process(def message) {
         validation = grailsApplication.config.getProperty("jms.validation", Boolean)
         def unmarshalled = Oxi3JaxbContext.unmarshall(message, validation)
-        println("bericht: ${unmarshalled}")
+        log.debug("bericht: ${unmarshalled}")
         bizzTalkService.send2BizzTalk(unmarshalled)
         return null//voor nu gaan we er even vanuit dat er niks terugkomt
     }
