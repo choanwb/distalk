@@ -38,7 +38,7 @@ class BizzTalkService {
                 response = send(SOAPAction: url) {
                     envelopeAttributes "xmlns":TNS
                     body {
-                        //sendSome(message)
+                        LepelBeschikbaar(message)
                     }
                 }
                 httpResponse = response?.httpResponse

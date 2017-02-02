@@ -5,6 +5,10 @@ import org.anwb.hv.ict.oxi.callinc.CompleterenIncidentMessage
 import org.anwb.hv.ict.oxi.callinc.EindemeldenIncidentMessage
 import org.anwb.hv.ict.oxi.callinc.MeldenStatusMessage
 import org.anwb.hv.ict.oxi.callinc.TeruggevenIncidentMessage
+import org.anwb.hv.oxi.dis_logicx.AlleLepelsNietBeschikbaar
+import org.anwb.hv.oxi.dis_logicx.LepelBeschikbaar
+import org.anwb.hv.oxi.dis_logicx.LepelLocatie
+import org.anwb.hv.oxi.dis_logicx.LepelNietBeschikbaar
 import org.anwb.hv.oxi3.util.Oxi3JaxbContext
 
 @Transactional
@@ -15,47 +19,62 @@ class AlcIncidentService {
 
     def process(def message) {
         validation = grailsApplication.config.getProperty("jms.validation", Boolean)
+        try {
         def unmarshalled = Oxi3JaxbContext.unmarshall(message, validation)
         log.debug("bericht: ${unmarshalled}")
-        bizzTalkService.send2BizzTalk(unmarshalled)
+            send2BizzTalkService(unmarshalled)
+        }
+        catch(MissingMethodException mme) {
+            log.error("Could not find a method to process oxi object in this service. " +
+                    "A method probably needs to be added :(", mme)
+            throw new Exception()
+        }
+        catch(Throwable e) {
+            log.error("Unable to process oxi message", e)
+            return null
+        }
         return null//voor nu gaan we er even vanuit dat er niks terugkomt
     }
 
-//    private void eindemeldenIncident(EindemeldenIncidentMessage message) {
-//        println("bericht: ${message}")
-//        //doe iets in bizztalkservice
-//    }
+    private void send2BizzTalkService(EindemeldenIncidentMessage message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
 
-//    private void completerenIncident(CompleterenIncidentMessage message) {
-//        println("bericht: ${message}")
-//        //doe iets in bizztalkservice
-//    }
-//
-//    private void meldenStatus(MeldenStatusMessage message) {
-//        println("bericht: ${message}")
-//        //doe iets in bizztalkservice
-//    }
-//
-//    private void teruggevenIncident(TeruggevenIncidentMessage message) {
-//        println("bericht: ${message}")
-//        //doe iets in bizztalkservice
-//    }
+    private void send2BizzTalkService(CompleterenIncidentMessage message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
 
-//    private void lepelLocatie(LepelLocatie message) {
-//        //doe iets in bizztalkservice
-//    }
-//
-//    private void lepelBeschikbaar(LepelBeschikbaar message) {
-//        //doe iets in bizztalkservice
-//    }
-//
-//    private void lepelNietBeschikbaar(LepelNietBeschikbaar message) {
-//        //doe iets in bizztalkservice
-//    }
-//
-//    private void alleLepelsNietBeschikbaar(AlleLepelsNietBeschikbaar message) {
-//
-//    }
+    private void send2BizzTalkService(MeldenStatusMessage message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
+
+    private void send2BizzTalkService(TeruggevenIncidentMessage message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
+
+    private void send2BizzTalkService(LepelLocatie message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
+
+    private void send2BizzTalkService(LepelBeschikbaar message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
+
+    private void send2BizzTalkService(LepelNietBeschikbaar message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
+
+    private void send2BizzTalkService(AlleLepelsNietBeschikbaar message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message)
+    }
 
 
 }

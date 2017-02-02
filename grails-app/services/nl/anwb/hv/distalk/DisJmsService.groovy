@@ -6,6 +6,7 @@ import org.anwb.hv.oxi3.util.Oxi3JaxbContext
 import javax.jms.Message
 
 @Transactional
+
 class DisJmsService {
     def jmsService
     def alcIncidentService
@@ -47,7 +48,8 @@ class DisJmsService {
     }
 
     def onMessage(msg) {
-        log.info(msg)
+        log.info("Received message from broker: ${msg}")
         alcIncidentService.process(msg)
+        return null//voor nu, maar misschien voor later ook
     }
 }
