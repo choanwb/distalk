@@ -76,7 +76,6 @@ dependencies {
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
     compile "nl.anwb.hv.oxi3:oxi3util:2.2.0.1"
     compile "nl.anwb.hv.oxi3:oxi-disinc:17.0"
-    compile "nl.anwb.hv.oxi3:oxi-logicx-dis:13.1-SNAPSHOT"
     compile "nl.anwb.hv.oxi3:oxi-dis-logicx:11.1"
     compile "nl.anwb.hv.oxi3:oxi-callinc:19.0"
     compile "org.grails.plugins:wslite:1.0.0.BUILD-SNAPSHOT"

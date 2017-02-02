@@ -65,6 +65,12 @@ class LavaSimulatorService {
         writeLog(message)
     }
 
+    @WebMethod
+    @WebResult
+    public void afmeldenIncident(AfmeldenIncidentMessage message){
+        writeLog(message)
+    }
+
     private writeLog(def message) {
         log.info("Het volgende SOAP bericht is ontvangen: ${message}")
     }

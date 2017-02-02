@@ -20,7 +20,7 @@ class AlcIncidentService {
         validation = grailsApplication.config.getProperty("jms.validation", Boolean)
         try {
         def unmarshalled = Oxi3JaxbContext.unmarshall(message, validation)
-        log.debug("bericht: ${unmarshalled}")
+        log.info("bericht: ${unmarshalled}")
             send2BizzTalkService(unmarshalled)
         }
         catch(MissingMethodException mme) {
