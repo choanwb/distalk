@@ -84,7 +84,7 @@ class SendJmsController {
                     </ns13:klanten>
                 </ns13:incident>
             </ns13:aanmeldenIncidentMessage>"""
-        disJmsService.sendJmsMessage(new AanmeldenIncidentMessage(), grailsApplication.config.getProperty("disel.sendQueue"))
+        disJmsService.sendJmsMessage(new AanmeldenIncidentMessage(), grailsApplication.config.getProperty("disel.requestQueue"))
         redirect(uri:'/')
     }
 

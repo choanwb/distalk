@@ -14,14 +14,13 @@ dataSource:
     password:
 
 disel:
-    sendQueue: anwb.hv.binnenland.dispatch.callQueue.Chi
-    receiveQueue: disel
+    requestQueue: anwb.hv.binnenland.dispatch.callQueue.Chi
+    responseQueue: anwb.hv.binnenland.obicall.callbrokerQueue.Chi
     timeout: 10
     proces: DEV_CHI
 
 logicx:
     destination: anwb.hv.binnenland.dispatch.disToLogicxQueue
-app.name: anwb.hv.binnenland.dispatch.disToLogicxQueue
 
 
 jms:
