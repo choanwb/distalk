@@ -16,10 +16,6 @@ import javax.jws.WebResult
 
 @Transactional
 @GrailsCxfEndpoint(name ='DisIncidentService')
-/**
- * Deze class is bedoeld om soapberichten te ontvangen en aan te bieden
- * aan de jms service voor verdere verwerking
- */
 class DisIncidentService {
     def disJmsService
     def grailsApplication
