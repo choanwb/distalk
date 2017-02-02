@@ -17,10 +17,17 @@ class BizzTalkService {
     def readTimeout
     def user
     def password
+    public static final int EINDEMELDEN_INCIDENT = 1
+    public static final int COMPLETEREN_INCIDENT = 2
+    public static final int MELDEN_STATUS = 3
+    public static final int TERUGGEVEN_INCIDENT = 4
+    public static final int LEPEL_LOCATIE = 5
+    public static final int LEPEL_BESCHIKBAAR = 6
+    public static final int LEPEL_NIET_BESHIKBAAR = 7
 
     static final TNS = ""
 
-    public boolean send2BizzTalk(def message) {
+    public boolean send2BizzTalk(def message, final int msgType) {
         url = grailsApplication.config.getProperty("bizztalk.url")
         if (grailsApplication.config.getProperty("bizztalk.nosend", Boolean)) {
             log.info("No send flag = true")
@@ -38,7 +45,32 @@ class BizzTalkService {
                 response = send(SOAPAction: url) {
                     envelopeAttributes "xmlns":TNS
                     body {
-                        LepelBeschikbaar(message)
+                        switch (msgType) {
+                        case EINDEMELDEN_INCIDENT:
+                            EindemeldenIncidentMessage(message)
+                            break
+                        case COMPLETEREN_INCIDENT:
+                            CompleterenIncidentMessage(message)
+                            break
+                        case MELDEN_STATUS:
+                            MeldenStatusMessage(message)
+                            break
+                        case TERUGGEVEN_INCIDENT:
+                            TeruggevenIncidentMessage(message)
+                            break
+                        case LEPEL_LOCATIE:
+                            LepelLocatie(message)
+                            break
+                        case LEPEL_BESCHIKBAAR:
+                            LepelBeschikbaar(message)
+                            break
+                        case LEPEL_NIET_BESHIKBAAR:
+                            LepelNietBeschikbaar(message)
+                            break
+                        default:
+                            log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
+                            return
+                        }
                     }
                 }
                 httpResponse = response?.httpResponse
@@ -48,34 +80,34 @@ class BizzTalkService {
                 }
 
                 def status = response//
-//                switch (status?.StatusCode) {
-//
-//                    case '0':
-//                        log.info("sendFormulierToHvva: Sent ${form} successfully")
-//                        break
-//
-//                    case '1':
-//                        log.error("sendFormulierToHvva: Technical Fault: ${status?.StatusMelding}")
-//                        httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                        httpResponse.statusMessage = status?.StatusMelding
-//                        break
-//
-//                    case '2':
-//                        log.error("sendFormuliertoHvva: HVVA fault: ${status?.StatusMelding}")
-//                        httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                        httpResponse.statusMessage = status?.StatusMelding
-//                        break
-//
-//                    default:
-//                        log.error("sendFormuliertoHvva: Unexcepted StatusCode: ${status?.StatusCode}")
-//                        if (httpResponse) {
-//                            httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                            httpResponse.statusMessage = status?.StatusMelding
-//                        }
-//                        else {
-//                            log.error("sendFormuliertoHvva: No httpResponse.")
-//                        }
-//                }
+                switch (status?.StatusCode) {
+
+                    case '0':
+                        log.info("send2BizzTalk: Sent ${message} successfully")
+                        break
+
+                    case '1':
+                        log.error("send2BizzTalk: Technical Fault: ${status?.StatusMelding}")
+                        httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
+                        httpResponse.statusMessage = status?.StatusMelding
+                        break
+
+                    case '2':
+                        log.error("send2BizzTalk: DISTALK fault: ${status?.StatusMelding}")
+                        httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
+                        httpResponse.statusMessage = status?.StatusMelding
+                        break
+
+                    default:
+                        log.error("send2BizzTalk: Unexcepted StatusCode: ${status?.StatusCode}")
+                        if (httpResponse) {
+                            httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
+                            httpResponse.statusMessage = status?.StatusMelding
+                        }
+                        else {
+                            log.error("send2BizzTalk: No httpResponse.")
+                        }
+                }
             }
             catch (SOAPFaultException sfe) {
                 log.error("CAUGHT: $sfe.message")

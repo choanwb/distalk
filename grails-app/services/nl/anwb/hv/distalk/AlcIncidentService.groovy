@@ -5,7 +5,6 @@ import org.anwb.hv.ict.oxi.callinc.CompleterenIncidentMessage
 import org.anwb.hv.ict.oxi.callinc.EindemeldenIncidentMessage
 import org.anwb.hv.ict.oxi.callinc.MeldenStatusMessage
 import org.anwb.hv.ict.oxi.callinc.TeruggevenIncidentMessage
-import org.anwb.hv.oxi.dis_logicx.AlleLepelsNietBeschikbaar
 import org.anwb.hv.oxi.dis_logicx.LepelBeschikbaar
 import org.anwb.hv.oxi.dis_logicx.LepelLocatie
 import org.anwb.hv.oxi.dis_logicx.LepelNietBeschikbaar
@@ -38,42 +37,37 @@ class AlcIncidentService {
 
     private void send2BizzTalkService(EindemeldenIncidentMessage message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
     }
 
     private void send2BizzTalkService(CompleterenIncidentMessage message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.COMPLETEREN_INCIDENT)
     }
 
     private void send2BizzTalkService(MeldenStatusMessage message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.MELDEN_STATUS)
     }
 
     private void send2BizzTalkService(TeruggevenIncidentMessage message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.TERUGGEVEN_INCIDENT)
     }
 
     private void send2BizzTalkService(LepelLocatie message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_LOCATIE)
     }
 
     private void send2BizzTalkService(LepelBeschikbaar message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_BESCHIKBAAR)
     }
 
     private void send2BizzTalkService(LepelNietBeschikbaar message) {
         log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
-    }
-
-    private void send2BizzTalkService(AlleLepelsNietBeschikbaar message) {
-        log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message)
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_NIET_BESHIKBAAR)
     }
 
 

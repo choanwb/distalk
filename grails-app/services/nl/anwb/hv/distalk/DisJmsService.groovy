@@ -11,7 +11,7 @@ class DisJmsService {
     def jmsService
     def alcIncidentService
     def grailsApplication
-    private static final String HERKOMST = "LOGICX"
+//    private static final String HERKOMST = "LOGICX"
     static exposes = ["jms"]
     static isTopic = Boolean.FALSE
     static destination = "anwb.hv.binnenland.dispatch.disToLogicxQueue.Chi"
@@ -27,7 +27,7 @@ class DisJmsService {
         def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
         jmsService.send(queue:(requestQueue), jmsMessage) { Message msg ->
             msg.setStringProperty("PROCES", process)
-            msg.setStringProperty("HERKOMST", HERKOMST)
+//            msg.setStringProperty("HERKOMST", HERKOMST)//niet van belang want de queue naam is doorslaggevend voor disel
             msg.setJMSReplyTo(createDestination(queue: receiveQueue))
         }
 
@@ -37,9 +37,8 @@ class DisJmsService {
             log.debug("Received reply: ${reply}")
         }
         log.info("Message sent to ${requestQueue}")
+        return null
     }
-
-    //TODO selectors? target = LOGICX
 
     def receiveJmsMessage(String receiveQueue) {
         def reply = jmsService.receiveSelected(receiveQueue, null)

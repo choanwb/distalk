@@ -38,6 +38,8 @@ bizztalk:
     readTimeout: 5000
     nosend: true
 
+lavasimulator: true
+
 #naam waaronder de services beschikbaar zijn
 cxf:
     servlet:

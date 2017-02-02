@@ -61,10 +61,4 @@ class DisIncidentService {
         disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
                 grailsApplication.config.getProperty("disel.responseQueue"))
     }
-
-//    @WebMethod
-//    @WebResult
-//    void testMethod(String hallo){
-//        println("reached code: ${hallo}")
-//    }
 }
