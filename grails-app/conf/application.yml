@@ -30,15 +30,19 @@ jms:
     validation: false
 
 bizztalk:
-    url: http://localhost:8080/blabla
+    url: http://localhost:8080/???????????
     user: chi
     password: pw
     source:
     connectTimeout: 5000
     readTimeout: 5000
-    nosend: true
+    nosend: false
 
 lavasimulator: true
+
+lava:
+    url: http://localhost:8080/disservices/lavasimulator
+    tns: http://distalk.hv.anwb.nl/
 
 #naam waaronder de services beschikbaar zijn
 cxf:

@@ -12,63 +12,64 @@ import org.anwb.hv.oxi.dis_logicx.LepelNietBeschikbaar
 import org.grails.cxf.utils.GrailsCxfEndpoint
 
 import javax.jws.WebMethod
+import javax.jws.WebParam
 import javax.jws.WebResult
 
 @Transactional
-@GrailsCxfEndpoint(name ='LavaSimulatorService')
+@GrailsCxfEndpoint//(name ='LavaSimulatorService')
 class LavaSimulatorService {
     @WebMethod
-    @WebResult
+    @WebResult(name = "EindemeldenIncidentMessage", targetNamespace = "")
     public void eindemeldenIncident(EindemeldenIncidentMessage message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
+    @WebResult(name = "CompleterenIncidentMessage", targetNamespace = "")
     public void completerenIncident(CompleterenIncidentMessage message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
+    @WebResult(name = "MeldenStatusMessage", targetNamespace = "")
     public void meldenStatus(MeldenStatusMessage message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
+    @WebResult(name = "TeruggevenIncidentMessage", targetNamespace = "")
     public void teruggevenIncident(TeruggevenIncidentMessage message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
+    @WebResult(name = "LepelLocatie", targetNamespace = "")
     public void lepelLocatie(LepelLocatie message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
+    @WebResult(name = "LepelBeschikbaar", targetNamespace = "")
     public void lepelBeschikbaar(LepelBeschikbaar message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
+    @WebResult(name = "LepelNietBeschikbaar", targetNamespace = "")
     public void lepelNietBeschikbaar(LepelNietBeschikbaar message) {
         writeLog(message)
     }
 
     @WebMethod
-    @WebResult
-    public void test(AfmeldenIncidentMessage message) {
+    @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "")
+    public void afmeldenIncident(AfmeldenIncidentMessage message){
         writeLog(message)
     }
 
     @WebMethod
     @WebResult
-    public void afmeldenIncident(AfmeldenIncidentMessage message){
-        writeLog(message)
+    public void test(@WebParam(name = 'name') String name) {
+        writeLog(name)
     }
 
     private writeLog(def message) {

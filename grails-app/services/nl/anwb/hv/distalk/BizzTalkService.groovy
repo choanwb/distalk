@@ -1,6 +1,7 @@
 package nl.anwb.hv.distalk
 
 import grails.transaction.Transactional
+import org.anwb.hv.oxi.dis_logicx.LepelLocatie
 import wslite.http.auth.HTTPBasicAuthorization
 import wslite.soap.SOAPClientException
 import wslite.soap.SOAPFaultException
@@ -25,10 +26,17 @@ class BizzTalkService {
     public static final int LEPEL_BESCHIKBAAR = 6
     public static final int LEPEL_NIET_BESHIKBAAR = 7
 
-    static final TNS = ""
+    //TODO TNS = ???????
+    private static final TNS = ""
 
     public boolean send2BizzTalk(def message, final int msgType) {
         url = grailsApplication.config.getProperty("bizztalk.url")
+
+        if (grailsApplication.config.getProperty("lavasimulator", Boolean)) {
+            send2Lavasimulator(message, msgType)
+            return
+        }
+
         if (grailsApplication.config.getProperty("bizztalk.nosend", Boolean)) {
             log.info("No send flag = true")
             return
@@ -41,31 +49,32 @@ class BizzTalkService {
 
         withSoap(params) {
             try{
-                authorization = new HTTPBasicAuthorization(user, password)
+                //authorization = new HTTPBasicAuthorization(user, password)
                 response = send(SOAPAction: url) {
+//                    version SOAPVersion.V1_2
                     envelopeAttributes "xmlns":TNS
                     body {
                         switch (msgType) {
                         case EINDEMELDEN_INCIDENT:
-                            EindemeldenIncidentMessage(message)
+                            eindemeldenIncidentMessage(message)
                             break
                         case COMPLETEREN_INCIDENT:
-                            CompleterenIncidentMessage(message)
+                            completerenIncidentMessage(message)
                             break
                         case MELDEN_STATUS:
-                            MeldenStatusMessage(message)
+                            meldenStatusMessage(message)
                             break
                         case TERUGGEVEN_INCIDENT:
-                            TeruggevenIncidentMessage(message)
+                            teruggevenIncidentMessage(message)
                             break
                         case LEPEL_LOCATIE:
-                            LepelLocatie(message)
+                            lepelLocatie(message)
                             break
                         case LEPEL_BESCHIKBAAR:
-                            LepelBeschikbaar(message)
+                            lepelBeschikbaar(message)
                             break
                         case LEPEL_NIET_BESHIKBAAR:
-                            LepelNietBeschikbaar(message)
+                            lepelNietBeschikbaar(message)
                             break
                         default:
                             log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
@@ -132,5 +141,74 @@ class BizzTalkService {
                 log.error("CAUGHT: $x.message", x)
             }
         }
+    }
+
+    public void send2Lavasimulator(def message, final int msgType) {
+        url = grailsApplication.config.getProperty("lava.url")
+        def tns = grailsApplication.config.getProperty("lava.tns")
+        def params = [serviceURL: url]
+        withSoap(params) {
+            def response = send(){
+                envelopeAttributes xmlns: tns
+                body {
+                    switch (msgType) {
+                        case EINDEMELDEN_INCIDENT:
+                            eindemeldenIncidentMessage(xmlns: tns) {
+                                message
+                            }
+                            break
+                        case COMPLETEREN_INCIDENT:
+                            completerenIncidentMessage(xmlns: tns) {
+                                message
+                            }
+                            break
+                        case MELDEN_STATUS:
+                            meldenStatusMessage(xmlns: tns) {
+                                message
+                            }
+                            break
+                        case TERUGGEVEN_INCIDENT:
+                            teruggevenIncidentMessage(xmlns: tns) {
+                                message
+                            }
+                            break
+                        case LEPEL_LOCATIE:
+                            lepelLocatie(message)
+                            break
+                        case LEPEL_BESCHIKBAAR:
+                            lepelBeschikbaar(xmlns: tns) {
+                                message
+                            }
+                            break
+                        case LEPEL_NIET_BESHIKBAAR:
+                            lepelNietBeschikbaar(xmlns: tns) {
+                                message
+                            }
+                            break
+                        default:
+                            log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
+                            return
+                    }
+                }
+            }
+            println response.LepelLocatieResponse.text()
+        }
+//        withSoap(params) {
+//            try {
+//                def response = send("""<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:dis='http://distalk.hv.anwb.nl/'>
+//                   <soapenv:Header/>
+//                   <soapenv:Body>
+//                      <dis:test>
+//                         <!--Optional:-->
+//                         <name>hallo</name>
+//                      </dis:test>
+//                   </soapenv:Body>
+//                </soapenv:Envelope>
+//                """)
+//            }
+//            catch(e){
+//                log.error("Caught:", e)
+//            }
+//        }
     }
 }
