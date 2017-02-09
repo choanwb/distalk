@@ -3,6 +3,7 @@ package nl.anwb.hv.distalk
 import grails.transaction.Transactional
 import org.anwb.hv.ict.oxi.callinc.EindemeldenIncidentMessage
 import org.anwb.hv.ict.oxi.callinc.MeldenStatusMessage
+import org.anwb.hv.ict.oxi.callinc.TeruggevenIncidentMessage
 import org.grails.cxf.utils.GrailsCxfEndpoint
 
 import javax.jws.WebMethod
@@ -15,15 +16,22 @@ class LavaSimulatorService {
 
     @WebMethod
     @WebResult(name = "EindemeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
-    public void eindemeldenIncidentMessage(@WebParam(name = "eindemeldenIncidentMessage",
+    void eindemeldenIncidentMessage(@WebParam(name = "eindemeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")EindemeldenIncidentMessage message) {
         writeLog(message)
     }
 
     @WebMethod
     @WebResult(name = "MeldenStatusMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
-    public void meldenStatusMessage(@WebParam(name="meldenStatusMessage",
+    void meldenStatusMessage(@WebParam(name="meldenStatusMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")MeldenStatusMessage message) {
+        writeLog(message)
+    }
+
+    @WebMethod
+    @WebResult(name = "TeruggevenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
+    public void teruggevenIncident(@WebParam(name = "teruggevenIncident",
+            targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")TeruggevenIncidentMessage message) {
         writeLog(message)
     }
 
@@ -31,14 +39,6 @@ class LavaSimulatorService {
 //    @WebResult(name = "CompleterenIncidentMessage", targetNamespace = "")
 //    public void completerenIncident(@WebParam(name = "",
 //    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")CompleterenIncidentMessage message) {
-//        writeLog(message)
-//    }
-
-//    @WebMethod
-//    @WebResult(name = "TeruggevenIncidentMessage", targetNamespace = "")
-//    public void teruggevenIncident(@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")TeruggevenIncidentMessage message) {
 //        writeLog(message)
 //    }
 //

@@ -29,7 +29,7 @@ class DisIncidentService {
 
     @WebMethod
     @WebResult(name = "AanmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
-    void aanmeldenIncident(@WebParam(name = "AanmeldenIncidentMessage",
+    void aanmeldenIncident(@WebParam(name = "aanmeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")AanmeldenIncidentMessage message){
         disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
                 grailsApplication.config.getProperty("disel.responseQueue"))
@@ -37,8 +37,16 @@ class DisIncidentService {
 
     @WebMethod
     @WebResult(name = "WijzigenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
-    void wijzigenIncident(@WebParam(name = "WijzigenIncidentMessage",
+    void wijzigenIncident(@WebParam(name = "wijzigenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")WijzigenIncidentMessage message){
+        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
+                grailsApplication.config.getProperty("disel.responseQueue"))
+    }
+
+    @WebMethod
+    @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
+    void afmeldenIncident(@WebParam(name = "afmeldenIncident",
+            targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")AfmeldenIncidentMessage message){
         disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
                 grailsApplication.config.getProperty("disel.responseQueue"))
     }
@@ -54,13 +62,6 @@ class DisIncidentService {
 //    @WebMethod
 //    @WebResult(name = "OpvragenOpdrachtinfoMessage", targetNamespace = "")
 //    AntwoordenOpdrachtinfoMessage opvragenOpdrachtInfo(OpvragenOpdrachtinfoMessage message){
-//        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
-//                grailsApplication.config.getProperty("disel.responseQueue"))
-//    }
-
-//    @WebMethod
-//    @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "")
-//    void afmeldenIncident(AfmeldenIncidentMessage message){
 //        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
 //                grailsApplication.config.getProperty("disel.responseQueue"))
 //    }
