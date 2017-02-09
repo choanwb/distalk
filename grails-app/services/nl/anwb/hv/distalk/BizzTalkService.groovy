@@ -159,22 +159,22 @@ class BizzTalkService {
                         body {
                             switch (msgType) {
                                 case EINDEMELDEN_INCIDENT:
-                                    "dis:EindemeldenIncidentMessage"(xmlns: tns) {
+                                    "dis:eindemeldenIncidentMessage"(xmlns: tns) {
                                         mkp.yieldUnescaped("${msg}")
                                     }
                                     break
                                 case COMPLETEREN_INCIDENT:
-                                    completerenIncidentMessage(xmlns: tns) {
+                                    "dis:completerenIncidentMessage"(xmlns: tns) {
                                         message
                                     }
                                     break
                                 case MELDEN_STATUS:
-                                    meldenStatusMessage(xmlns: tns) {
+                                    "dis:meldenStatusMessage"(xmlns: tns) {
                                         message
                                     }
                                     break
                                 case TERUGGEVEN_INCIDENT:
-                                    teruggevenIncidentMessage(xmlns: tns) {
+                                    "dis:teruggevenIncidentMessage"(xmlns: tns) {
                                         message
                                     }
                                     break
@@ -185,12 +185,12 @@ class BizzTalkService {
                                     }
                                     break
                                 case LEPEL_BESCHIKBAAR:
-                                    lepelBeschikbaar(xmlns: tns) {
+                                    "dis:lepelBeschikbaar"(xmlns: tns) {
                                         message
                                     }
                                     break
                                 case LEPEL_NIET_BESHIKBAAR:
-                                    lepelNietBeschikbaar(xmlns: tns) {
+                                    "dis:lepelNietBeschikbaar"(xmlns: tns) {
                                         message
                                     }
                                     break

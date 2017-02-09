@@ -18,7 +18,7 @@ class AlcIncidentService {
     def bizzTalkService
     Boolean validation = Boolean.FALSE
     def parser = new XmlParser()
-    Boolean oxiCheck = Boolean.TRUE
+    Boolean oxiCheck = Boolean.FALSE
 
     def process(def msg) {
         validation = grailsApplication.config.getProperty("jms.validation", Boolean)
@@ -55,6 +55,11 @@ class AlcIncidentService {
         bizzTalkService.send2BizzTalk(message, bizzTalkService.MELDEN_STATUS)
     }
 
+    private void send2BizzTalkService(String message) {
+        log.debug("bericht: ${message}")
+        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
+    }
+
 //    private void send2BizzTalkService(CompleterenIncidentMessage message) {
 //        log.debug("bericht: ${message}")
 //        bizzTalkService.send2BizzTalk(message, bizzTalkService.COMPLETEREN_INCIDENT)
@@ -79,11 +84,6 @@ class AlcIncidentService {
 //        log.debug("bericht: ${message}")
 //        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_NIET_BESHIKBAAR)
 //    }
-
-    private void send2BizzTalkService(String message) {
-        log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
-    }
 
     /*
     removes the version from the xml (<?xml version="1.0" encoding="UTF-8" standalone="yes"?>)
