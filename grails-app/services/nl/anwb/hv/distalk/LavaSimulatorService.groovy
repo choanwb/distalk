@@ -15,14 +15,14 @@ class LavaSimulatorService {
 
     @WebMethod
     @WebResult(name = "EindemeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
-    public void eindemeldenIncident(@WebParam(name = "EindemeldenIncidentMessage",
+    public void EindemeldenIncidentMessage(@WebParam(name = "eindemeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")EindemeldenIncidentMessage message) {
         writeLog(message)
     }
 
     @WebMethod
     @WebResult(name = "MeldenStatusMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
-    public void meldenStatus(@WebParam(name="MeldenStatusMessage",
+    public void MeldenStatusMessage(@WebParam(name="meldenStatusMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")MeldenStatusMessage message) {
         writeLog(message)
     }
@@ -66,7 +66,7 @@ class LavaSimulatorService {
 
 //    @WebMethod
 //    @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "")
-//    public void afmeldenIncident(AfmeldenIncidentMessage message){
+//    public void afmeldenIncidentMessage(AfmeldenIncidentMessage message){
 //        writeLog(message)
 //    }
 

@@ -1,13 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <!--
-- Messages die de ANWB/Dis naar LogicX stuurt (ongeacht of dit mededelingen,
-- aanvragen, of antwoorden zijn).
-- 
-- LET OP: Ontvangers van deze berichten worden geacht deze bij het
-- inlezen (parsen) te valideren aan de hand van _dit_ schema, en moeten als
-- het XML bericht niet volledig fout- en waarschuwingsvrij parsed dit XML
-- bericht als ongeldig terzijde leggen en een FoutBericht terug sturen.
+- Berichten die Dis(patch) naar Excis (Logicx) en Lava (Logicx) stuurt.
+- (Als berichten naar beide gestuurt kunnen worden wordt de term 
+- "Logicx" gebruikt.)
 -
 - In de XML instanties moeten alle waarden van het type xs:timeDate
 - voorzien zijn van of de 'Z' (zulu) timezone indicatie of van een timezone
@@ -21,15 +17,28 @@
 <xs:schema
   targetNamespace='http://anwb.org/hv/ict/dis-logicx-11.0'
   xmlns='http://anwb.org/hv/ict/dis-logicx-11.0'
+  xmlns:obi='http://anwb.org/hv/ict/oxi/obi'
   xmlns:xs='http://www.w3.org/2001/XMLSchema'
-  elementFormDefault='qualified'>
-  
+  elementFormDefault='qualified'
+  >
+
+  <xs:import namespace='http://anwb.org/hv/ict/oxi/obi'/>
+
   <!--
-  - Status Lepelwagen bericht. Via dit bericht wordt LogicX geinformeerd
-  - over de beschikbaarheid/onbeschikbaarheid van Lepels.
+  - Lepel beschikbaar voor Logicx. Via dit bericht, en LepelNietBeschikbaar,
+  - geeft Dis aan Logicx te kennen of Logicx deze lepel mag aanwijzen
+  - in een logicxdis:AanvraagLepel of
+  - disinc:aanmeldenIncidentBericht/transportOpdracht.
   -
-  - De indentificatie van een lepel, dat eigenlijk een man-voertuig inzet-
-  - eenheid is, loopt via het kenteken.
+  - Deze "Bechikbaarheid voor Logicx' is een substatus van de Dis status
+  - BESCHIKBAAR (en ONDERBREKEN_VRIJ???). Een lepel kan binnen Dis BESCHIKBAAR
+  - zijn, terwijl de lepel toch niet beschikbaar is gesteld voor Logicx.
+  -
+  - Planners binnen het ANWB Dispatch Center in Plawa bepalen of een lepel
+  - (on-)beschikbaar is voor Logicx.
+  -
+  - De indentificatie van een lepel, dat eigenlijk een man-voertuig combinatie
+  - is, loopt via het kenteken (Excis) of mannummer (Lava).
   -
   - Indien de lepel beschikbaar gesteld wordt (beschikbaar='true') dan
   - volgt kort na dit status bericht een eerste LepelLocatie bericht. 
@@ -38,56 +47,116 @@
    <xs:element name='LepelBeschikbaar'>
     <xs:complexType>
       <xs:sequence>
-        <!-- Bericht id. -->
+
+        <!--
+        - Bericht id.
+        - Bij analyse van de Dis code blijkt dit de actuele systeem tijd
+        - te zijn (System.currentTimeMillis()).
+        - M.a..w. dit is een onzin-gegeven.
+        -->
         <xs:element name='berichtnummer' type='xs:int'/>
-        
+
         <!-- Identificatie van de lepel. -->
         <xs:element name='kenteken' type='xs:string'/>
-        
+
         <!-- Mannummer van de hulpverlener. -->
         <xs:element name='mannummer' type='xs:int'/>
-        
+
         <!-- Voornaam van de hulpverlener -->
         <xs:element name='voornaam' type='xs:string'/>
-        
+
         <!-- Achternaam van de hulpverlener -->
         <xs:element name='achternaam' type='xs:string'/>
-        
-        <!-- Personeelsnummer van de hulpverlener? -->
+
+        <!-- Personeelsnummer van de hulpverlener. -->
         <xs:element name='personeelsnummer' type='xs:int'/>
-        
+
         <!-- Het (GRIP) telefoonnummer van de hulpverlener. -->
         <xs:element name='gripnummer' type='xs:string'/>
 
-        <!-- einde dienst tijd van de lepel chauffeur -->
+        <!-- einde dienst tijd van de hulpverlener. -->
         <xs:element name='eindeDienst' type='xs:dateTime'/>
-        
-        <!-- (X,Y) stallingslocatie in meters in het Rijksdriehoek stelsel -->
-        <xs:element name='stalX' type='xs:long' />
-        <xs:element name='stalY' type='xs:long' />
 
-        <!-- (X,Y) actuele locatie in meters in het Rijksdriehoek stelsel -->
-        <xs:element name='X' type='xs:long' />
-        <xs:element name='Y' type='xs:long' />
-        
+        <!--
+        - Stallingslocatie.
+        -->
+        <xs:choice>
+          <xs:sequence>
+            <!--
+            - DEPRECATED.
+            - (X,Y) stallingslocatie in meters in het Rijksdriehoek stelsel.
+            - Alleen nog naar Excis, niet meer naar Lava.
+            - Deze elementen worden verwijdert nadat Excis uit gezet is.
+            -->
+            <xs:element name='stalX' type='xs:long'/>
+            <xs:element name='stalY' type='xs:long'/>
+          </xs:sequence>
+
+          <!--
+          - Stallingslocatie.
+          - Alleen naar Lava (lat,lng), niet meer naar Excis.
+          -->
+          <xs:element name='stallingsLocatie' type='obi:Coordinate'/>
+
+        </xs:choice>
+
+        <!--
+        - Actuele locatie.
+        -->
+        <xs:choice>
+          <xs:sequence>
+            <!--
+            - DEPRECATED
+            - (X,Y) actuele locatie in meters in het Rijksdriehoek stelsel
+            - Alleen nog naar Excis, niet meer naar Lava.
+            - Deze elementen worden verwijdert nadat Excis uit gezet is.
+            -->
+            <xs:element name='X' type='xs:long'/>
+            <xs:element name='Y' type='xs:long'/>
+          </xs:sequence>
+
+          <!--
+          - De actuele locatie.  Alleen naar Lava, niet meer naar Excis.
+          - Naar Lava worden (lat,lng) coordinaten gestuurt.
+          -->
+          <xs:element name='locatie' type='obi:Coordinate'/>
+        </xs:choice>
+
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  
+
+
+  <!--
+  - Lepel niet beschikbaar voor Logicx.
+  - Zie ook commentaar bij LepelBeschikbaar.
+  -->
+
   <xs:element name='LepelNietBeschikbaar'>
     <xs:complexType>
       <xs:sequence>
-        <!-- Bericht id. -->
+
+        <!-- Bericht id. Zie verder LepelBeschikbaar/berichtnummer. -->
         <xs:element name='berichtnummer' type='xs:int'/>
-        
-        <!-- Identificatie van de lepel. -->
+
+        <!-- Kenteken van de lepel. -->
         <xs:element name='kenteken' type='xs:string'/>
+
+        <!--
+        - Mannummer van de hulpverlener.
+        - Wordt alleen ingevuld bij berichten naar Lava.
+        - Wordt verplicht nadat Excis is uitgefaseerd.
+        -->
+        <xs:element name='mannummer' type='xs:int' minOccurs="0"/>
+
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
+
   <!--
-  - GPS bericht lepelwagens.
+  - Lepel locatie.
+  -
   - Voor beschikbaar gestelde en in opdracht van LogicX uitvoerende lepels
   - ontvangt LogicX locatie gegevens. 
   -
@@ -96,33 +165,49 @@
   - NB: Dit bericht is helemaal uitgekleed omdat de lepel status (ex locatie)
   - verplaats is naar het nieuwe <LepelStatus> bericht.
   -->
+
   <xs:element name='LepelLocatie'>
     <xs:complexType>
       <xs:sequence>
-        <!-- Bericht id. -->
+
+        <!-- Bericht id. Zie commentaar bij LepelBeschikbaar/berichtnummer. -->
         <xs:element name='berichtnummer' type='xs:int'/>
-        
-        <!-- Identificatie van de lepel. -->
-        <xs:element name='mannummer' type='xs:int'/>
-        
+
+        <!-- Kenteken van de lepel. -->
+        <xs:element name='kenteken' type='xs:string'/>
+
         <!-- Lepel beschikbaar voor Logicx? -->
         <xs:element name='beschikbaar' type='xs:boolean'/>
-        
-        <!-- (X,Y) locatie in meters in het Rijksdriehoek stelsel -->
-        <xs:element name='X' type='xs:long' minOccurs='0'/>
-        <xs:element name='Y' type='xs:long' minOccurs='0'/>
-        <!-- (Lat, Long) locatie -->
-        <xs:element name='lat' type='xs:double' minOccurs='0'/>
-        <xs:element name='long' type='xs:double' minOccurs='0'/>
+
+        <!--
+        - (X,Y) locatie in meters in het Rijksdriehoek stelsel.
+        - Alleen nog naar Excis, niet meer naar Lava, en daarom tijdelijk
+        - optioneel.
+        - Deze elementen worden verwijdert nadat Excis uit gezet is.
+        -->
+        <xs:element name='X' type='xs:long' minOccurs="0"/>
+        <xs:element name='Y' type='xs:long' minOccurs="1"/>
+
+        <!--
+        - De actuele locatie.  Alleen naar Lava, niet meer naar Excis,
+        - en daarom tijdelijk optioneel gemaakt.
+        - Naar Lava worden lat,lng coordinaten gestuurt.
+        - Dit element wordt verplicht nadat Excis uit gezet is.
+        -->
+        <xs:element name='locatie' type='obi:Coordinate' minOccurs="0"/>
+
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
   <!--
-    FoutBericht dat doorspatch naar Logicx gestuurd wordt 
-    als een binnenkomend bericht om wat voor reden dan ook niet
-    verwerkt kan worden. De reden kan in het element 'melding' gezet worden,
-    eventueel het betreffende bericht als een CDATA blok in offendingMessage
+  - FoutBericht dat door Dis naar Logicx gestuurd wordt 
+  - als een binnenkomend bericht om wat voor reden dan ook niet
+  - verwerkt kan worden. De reden kan in het element 'melding' gezet worden,
+  - eventueel het betreffende bericht als een CDATA blok in offendingMessage
+  -
+  - Een eerste code-analyse leert dat bericht kennelijk nooit door Dis naar
+  - Logicx gestuurd wordt.
   -->
   <xs:element name='FoutBericht'>
     <xs:complexType>
@@ -136,23 +221,17 @@
     </xs:complexType>
   </xs:element>
 
+
   <!--
-  - Dit bericht wordt gestuurd als alle lepels in 1 klap
-  - niet-beschikbaar gemaakt moeten worden. Dit kan b.v. gebeuren als
-  -     Dispatch gecontroleerd down gaat
-  -     Dispatch opstart, waarna alle beschikbare Lepels aangemeld worden
-  -     (deze laatste om alles goed te laten lopen als Dispatch crashed
-  - de reden is verplicht, zodat Logicx planners weten wat er aan de hand is
-  --> 
-  <xs:element name='AlleLepelsNietBeschikbaar'>
-    <xs:complexType>
-      <xs:all>
-        <!-- Bericht id. -->
-        <xs:element name='berichtnummer' type='xs:int'/>
-        <!-- reden waarom -->
-        <xs:element name='reden' type='xs:string'/>
-      </xs:all>
-    </xs:complexType>
-  </xs:element>
+  - Een aflevering kan bestaan uit de Inzittenden of het Voertuig zelf
+  -->
+
+  <xs:simpleType name="Aflevering">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Inzittenden"/>
+      <xs:enumeration value="Voertuig"/>
+    </xs:restriction>
+  </xs:simpleType>
+
 </xs:schema>
 

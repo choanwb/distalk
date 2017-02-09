@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
 <!--
 - Een collectie van type definities waarna vanuit verschillende
 - andere schema's gerefereerd wordt.
 -->
-<xs:schema xmlns="http://anwb.org/hv/ict/oxi/obi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://anwb.org/hv/ict/oxi/obi">
 
+
+<xs:schema xmlns="http://anwb.org/hv/ict/oxi/obi"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    targetNamespace="http://anwb.org/hv/ict/oxi/obi">
+
+  <xs:simpleType name="String8">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="8"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="String16">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="16"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="String32">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="32"/>
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:complexType name="LocatieIndicatie">
     <xs:choice>
@@ -17,23 +40,27 @@
 
   <xs:complexType name="Klant">
     <xs:all>
-      <xs:element minOccurs="0" name="naam" type="xs:string"/>
-      <xs:element minOccurs="0" name="voorletters" type="xs:string"/>
-      <xs:element minOccurs="0" name="tussenvoegsel" type="xs:string"/>
-      <xs:element minOccurs="0" name="achternaam" type="xs:string"/>
-      <xs:element minOccurs="0" name="adres" type="Adres"/>
-      <xs:element minOccurs="0" name="postcode" type="xs:string"/>
-      <xs:element minOccurs="0" name="lidsoort" type="xs:string"/>
-      <xs:element minOccurs="0" name="productcode" type="xs:string"/>
-      <!-- RSH: wat is de zin van een bolean contract ?? -->
-      <xs:element minOccurs="0" name="contract" type="xs:boolean"/>
-      <xs:element minOccurs="0" name="type_contract" type="xs:int"/>
+      <xs:element name="naam" type="xs:string" minOccurs="0"/>
+      <xs:element name="voorletters" type="xs:string" minOccurs="0"/>
+      <xs:element name="tussenvoegsel" type="xs:string" minOccurs="0"/>
+      <xs:element name="achternaam" type="xs:string" minOccurs="0"/>
+      <xs:element name="adres" type="Adres" minOccurs="0"/>
+      <xs:element name="postcode" type="xs:string" minOccurs="0"/>
+
+      <xs:element name='telefoonnummer' type='String16' minOccurs='0'/>
+
+      <xs:element name="lidsoort" type="xs:string" minOccurs="0"/>
+      <xs:element name="productcode" type="xs:string" minOccurs="0"/>
+
+      <xs:element name="contract" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="type_contract" type="xs:int" minOccurs="0"/>
       <!-- hierin komt de volledige naam van het contract of de zusterclub -->
-      <xs:element minOccurs="0" name="naam_contract" type="xs:string"/>
+      <xs:element name="naam_contract" type="xs:string" minOccurs="0"/>
       <!-- hierin komt de maatschappij code of de afkorting van de zusterclub -->
-      <xs:element minOccurs="0" name="maatschappij_code" type="xs:string"/>
-      <xs:element minOccurs="0" name="contract_id" type="xs:string"/>
-      <xs:element minOccurs="0" name="contract_versie" type="xs:string"/>
+      <xs:element name="maatschappij_code" type="xs:string" minOccurs="0"/>
+      <xs:element name="contract_id" type="xs:string" minOccurs="0"/>
+      <xs:element name="contract_versie" type="xs:string" minOccurs="0"/>
+      <xs:element name='contractcode' type='xs:int' minOccurs='0'/>
 
       <xs:element name='rechten' type='Rechten' minOccurs='0'/>
     </xs:all>
@@ -185,6 +212,8 @@ die eenletter codes niet erg duidelijk zijn.
       <xs:element name="plaats" type="xs:string"/>
       <xs:element name="straat" type="xs:string"/>
       <xs:element name="huisnummer" type="Huisnummer"/>
+      <xs:element name='land' type='String16' minOccurs='0'/>
+      <xs:element name='postcode' type='String8' minOccurs='0'/>
     </xs:all>
   </xs:complexType>
 
@@ -419,6 +448,106 @@ die eenletter codes niet erg duidelijk zijn.
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name='OpdrachtResultatenType'>
+    <xs:sequence>
+        <xs:element name='OpdrachtResultaat' type='OpdrachtResultaatType'
+        minOccurs='0' maxOccurs='unbounded' />
+    </xs:sequence>
+  </xs:complexType>
 
+  <!-- Opdracht resultaten uitgebreidt met code-omschrijvingen. -->
+  <xs:complexType name='OpdrachtResultatenExtraType'>
+    <xs:sequence>
+        <xs:element name='OpdrachtResultaat'
+          type='OpdrachtResultaatExtraType'
+          minOccurs='0'
+          maxOccurs='unbounded' />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OpdrachtResultaatType">
+    <xs:sequence>
+      <xs:element name="Component" type="xs:string"/>
+      <xs:element name="Gebrek" type="xs:string"/>
+      <xs:element name="Actie" type="xs:string"/>
+      <xs:element name="Toelichting" type="xs:string" minOccurs='0' />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- OpdrachtResultaatType uitgebreidt met code-omschrijvingen. -->
+  <xs:complexType name="OpdrachtResultaatExtraType">
+    <xs:complexContent>
+      <xs:extension base="OpdrachtResultaatType">
+         <xs:sequence>
+            <xs:element name="ComponentOmchrijving" type="xs:string"/>
+            <xs:element name="GebrekOmchrijving" type="xs:string"/>
+            <xs:element name="ActieOmchrijving" type="xs:string"/>
+         </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!--
+  - Een geographische of geodetische coordinate.
+  -
+  - Een coordinaat is een (x,y) volgens het Rijksdriehoeksstelsel,
+  - of (lat,long) volgens WGS84 ("GPS")).
+  -
+  - X en y zijn rijksdriehoekgscoordinaten (in hele meters) die eigenlijk
+  - alleen in Nederland bruikbaar zijn.
+  - 
+  - Lat en long zijn geografische coordinaten waarmee in ieder geval
+  - in heel (West-)Europa posities bepaald kunnen worden.
+  - In decimale graden, positief voor N en O, negatief voor Z en W.
+  -   B.v. centrum Amersfoort: lat='52.155209' lng='5.387235'
+  -   B.v. centrum Bristol: lat='51.451343' lng='-2.587585'.
+  -
+  - Van Care en Flow worden (x,y) verwacht, en van Lava (lat,lng), maar niets
+  - staat in de weg dat b.v. Care in de toekomst naar (lat,lng) switched.
+  -
+  - Dis werkt intern met (x,y) coordinaten. Bij ontvangst zal Dis zal (lat,lng)
+  - omrekenen naar (x,y) daarmee werken.
+  -
+  - TODO: check: (lat,lng) volgens WGS84 ("GPS")?
+  - TODO: Omrekening van (x,y) naar (lat,lng) en v.v. volgens TBD
+  - TODO" belang wegtype?
+  - TODO: Moeten we aan locatie een expliciete coordsysteem toevoegen?
+  -     Mischien wel zo toekomst vast.
+  -->
+
+  <xs:complexType name='Coordinate'>
+    <xs:choice>
+      <!-- TODO: een van beide, maar niet beide! Willen we dat? -->
+      <xs:group ref="CoordinateXYGroup"/>
+      <xs:group ref="CoordinateWGS84Group"/>
+    </xs:choice>
+  </xs:complexType>
+
+
+  <xs:complexType name='CoordinateXY'>
+    <xs:group ref="CoordinateXYGroup"/>
+  </xs:complexType>
+
+
+  <xs:complexType name='CoordinateWGS84'>
+    <xs:group ref="CoordinateWGS84Group"/>
+  </xs:complexType>
+
+
+  <xs:group name="CoordinateXYGroup">
+    <xs:sequence>
+      <xs:element name='x' type='xs:long'/>
+      <xs:element name='y' type='xs:long'/>
+    </xs:sequence>
+  </xs:group>
+
+
+  <xs:group name="CoordinateWGS84Group">
+    <xs:sequence>
+      <xs:element name='lat' type='xs:decimal'/>
+      <xs:element name='lng' type='xs:decimal'/>
+    </xs:sequence>
+  </xs:group>
 
 </xs:schema>
+

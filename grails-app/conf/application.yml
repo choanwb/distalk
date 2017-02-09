@@ -40,7 +40,7 @@ bizztalk:
 
 lavasimulator: true
 
-lava:
+lavasim:
     url: http://localhost:8080/disservices/lavasimulator
     tns: http://distalk.hv.anwb.nl/
 

@@ -1,95 +1,171 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
+
 <!--
-- Messages processed by OBIcall pertaining to incidents. These messages are
-- mostly send by OBIdis or OBIweg.
+- Berichten die Dis(patch) en "Weg" stuurt naar Care, Flow, of Lava (Logicx).
 -
-- OBIcall identificeerd incidenten richting OBIdis met een
-- incident nummer en een actie nummer. OBIdis/OBIweg moet beide nummers
-- repliceren in alle (antwoord-)berichten richting OBIcall.
+- "Weg" kan gezien worden als een onderdeel van Dis, en is dan m.n. die
+- software die in de wegenwacht auto zit (ook bekend als "Client",
+- "wwi", of "wwdc" (take your pick)), en die software die in het backoffice
+- het directe contact onderhoud met de "Client".
+-
+- Belangrijk: Voor algemene informatie over "incidenten", opdrachten, incident-
+- en opdrachtnummers, en referentiegegevens, zie disincident.xsd.
 -->
 
 <xs:schema xmlns='http://anwb.org/hv/ict/oxi/callinc'
-  targetNamespace='http://anwb.org/hv/ict/oxi/callinc'
-  xmlns:xs='http://www.w3.org/2001/XMLSchema'
-  xmlns:obi='http://anwb.org/hv/ict/oxi/obi'
-  elementFormDefault='qualified'>
+    targetNamespace='http://anwb.org/hv/ict/oxi/callinc'
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    xmlns:obi='http://anwb.org/hv/ict/oxi/obi'
+    elementFormDefault='qualified'>
 
   <xs:import namespace='http://anwb.org/hv/ict/oxi/obi'/>
 
-  <!--
-  - Message send from OBIdis to OBIcall.
-  - Met dit bericht kan een incident door de WEG-organisatie worden
-  - teruggegeven aan CALL. De WEG zal het niet verder in behandeling namen.
-  -->
-  <xs:complexType name='teruggevenIncidentMessage'>
-    <xs:sequence>
-      <!-- Identificatie van het teruggegeven incident. -->
-      <xs:element name='incidentnummer' type='xs:int'/>
-
-      <!-- actienummer slaat op sleutelhulp en veiligstel gecombineerd -->
-      <xs:element name='actienummer' type='xs:int' minOccurs='0'/>
-      <xs:element name='transportActienummer' type='xs:int' minOccurs='0' />
-
-      <!-- Enventueele reden van de teruggave. -->
-      <xs:element name='omschrijving' type='xs:string' minOccurs='0'/>
-
-      <!-- Identificatie van de teruggever. -->
-      <xs:element name='personeelsnummer' type='xs:int' />
-      <xs:element name='naam' type='xs:string' />
-
-      <!-- Tijdstip teruggave -->
-      <xs:element name='tijdstip' type='xs:dateTime' />
-    </xs:sequence>
-  </xs:complexType>
 
   <!--
-  - Message send from OBIweg to OBIcall.
-  - Met dit bericht wordt melding gemaakt van een wegenwacht aantekening
-  - Geen retour bericht.
+  - Bericht van Dis naar Alc.
+  -
+  - Met dit bericht kan een incident door Dis worden teruggegeven aan Alc.
+  - Dis zal het incident niet verder in behandeling namen. Het incident
+  - verdwijnt daarmee uit Dis.
+  -
+  - Tussen Dis en Care of Flow geldt de volgende hack: als Care of Flow
+  - een incident probeert aan te melden met lbi classificatie 1 of 2,
+  - of een lbi3 incident zonder geldige locatie of veiligstellocatie
+  - dan zal Dis een teruggevenIncidentMessage sturen ipv een disinc:Resultaat. 
+  -
+  - TODO:
+  -     (1) dit bericht is nog teveel geent op Care. Care gebruikte
+  -         het zelfde actienummer voor veiligstel- en bijbehorende sleutelopdracht.
+  -     (2) de beide actienummers kunnen beter verwijdert worden.
+  -         Het gaat om het teruggeven van het hele incident, en
+  -         de actienummers zijn bij Alc bekend.
+  -         transportActienummer wordt zowiezo al niet door Dis opgestuurd.
   -->
-  <xs:complexType name='meldenWWaantekeningMessage'>
-    <xs:sequence>
-      <!-- De incident indentificatie. -->
-      <xs:element name='incidentnummer' type='xs:int'/>
 
-      <xs:element name='personeelsnummer' type='xs:int' />
-      <xs:element name='kenteken' type='xs:string' minOccurs='0' />
-      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0' />
-      <xs:element name='aantekening' type='xs:string' />
-    </xs:sequence>
-  </xs:complexType>
+  <xs:element name='teruggevenIncidentMessage'>
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Identificatie van het teruggegeven incident. -->
+        <xs:element name='incidentnummer' type='xs:int'/>
+
+        <!--
+        - actienummer slaat op sleutelhulp en veiligstel gecombineerd
+        - DEPRECATED: verwijderen
+        -->
+        <xs:element name='actienummer' type='xs:int' minOccurs='0'/>
+
+        <!-- DEPRECATED: Wordt door Dis nooit ingevuld. -->
+        <xs:element name='transportActienummer' type='xs:int' minOccurs='0' />
+
+        <!-- Enventueele reden van de teruggave. -->
+        <xs:element name='omschrijving' type='xs:string' minOccurs='0'/>
+
+        <!--
+        - Identificatie van de teruggever.
+        - Meestal een planner bij Dispatch.
+        - Bij de aanmelden incident hack resp 999999 en Dispatch.
+        -->
+        <xs:element name='personeelsnummer' type='xs:int' />
+        <xs:element name='naam' type='xs:string' />
+
+        <!-- Tijdstip teruggave -->
+        <xs:element name='tijdstip' type='xs:dateTime' />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
 
   <!--
-  - Message send from OBIdis to OBIcall.
+  - Bericht van Weg naar Alc.
+  -
+  - Met dit bericht wordt melding gemaakt van een wegenwacht aantekening.
+  - De aantekening kan betrekking hebben op het lid en/of het pechvoertuig.
+  -
+  - Er is geen retour of bevestigingsbericht gedefinieerd.
   -->
-  <xs:complexType name='meldenStatusMessage'>
-    <xs:all>
-      <xs:element name='incidentnummer' type='xs:int' />
-      <xs:element name='actienummer'    type='xs:int' />
-      <xs:element name='incidentstatus' type='StatusEnum' />
-      <xs:element name='taak'           type='obi:TaakTypeEnum'/>
-      <xs:element name='taakstatus'     type='StatusEnum'/>
-      <!--xs:element name='wegenwacht'     type='obi:Wegenwacht' minOccurs='0'/-->
-      <xs:element name='gecommuniceerdeWachttijd' type='xs:int' minOccurs='0'/>
-    </xs:all>
-  </xs:complexType>
+
+  <xs:element name='meldenWWaantekeningMessage'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='incidentnummer' type='xs:int'/>
+
+        <xs:element name='personeelsnummer' type='xs:int' />
+
+        <!-- TODO: check: kenteken van pechvoertuig? -->
+        <xs:element name='kenteken' type='xs:string' minOccurs='0' />
+        <xs:element name='klantLidnummer' type='xs:int' minOccurs='0' />
+
+        <xs:element name='aantekening' type='xs:string' />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
 
   <!--
-  - Message send from OBIweg to OBIcall.
-  - Met dit bericht kan WEG de journaalaantekenignen
-  - van een incident opvragen bij CALL.
+  - Bericht van Dis naar Alc van een opdrachtstatusverandering.
+  - De nieuwe opdrachtstatus wordt vermeldt.
+  -
+  - Een incident kan een actieve veiligstel-, en/of sleutel-, en/of
+  - transportopdracht hebben. Binnen Dis heten opdrachten ook wel taken.
+  - Het sub-element 'taak' van type 'obi:TaakTypeEnum' geeft aan van welk
+  - type opdracht (taak) dit bericht de statusverandering meldt.
+  -
+  - Een taak heeft binnen Dis een taakstatus. Een incident kan bestaan uit
+  - meerdere taken. De incidentstatus is een functie (afgeleide) van de
+  - taakstatussen.
+  -
+  - TODO: Voor Lava: deeltransport afmelding toevoegen.
   -->
-  <xs:complexType name='opvragenJournaalaantekeningMessage'>
-    <xs:all>
-      <xs:element name='kenteken' type='xs:string' minOccurs='0' />
-      <!-- xs:choice -->
-      <!-- Bij een lid direct het klantLidnummer invullen, bij meerdere leden het wrapper element gebruiken -->
-      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
-      <xs:element name='klantLidnummers' type='KlantLidnummersType' minOccurs='0' />
-      <!-- /xs:choice -->
-    </xs:all>
-  </xs:complexType>
+
+  <xs:element name='meldenStatusMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incidentnummer' type='xs:int' />
+
+        <!-- Actienummer van veiligstel-, sleutel-, of transportopdracht. -->
+        <xs:element name='actienummer' type='xs:int' />
+
+        <xs:element name='incidentstatus' type='StatusEnum' />
+
+        <!-- Veiligstel-, sleutel-, of transporttaak met status. -->
+        <xs:element name='taak' type='obi:TaakTypeEnum'/>
+        <xs:element name='taakstatus' type='StatusEnum'/>
+
+        <!-- DEPRECATED: wordt kennelijk nooit meer meegezonden. Is ook een
+        onzinnig attribute voor dit bericht. -->
+        <xs:element name='gecommuniceerdeWachttijd' type='xs:int' minOccurs='0'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Bericht van Weg naar Alc.
+  - Met dit bericht kan Dis aan Alc de aantekeningen opvragen inzake
+  - een bepaald pechvoertuig en/of bepaalde leden.
+  -
+  - Het antwoord is een antwoordenJournaalaantekeningMessage.
+  -
+  - TODO: Ook naar Lava?
+  -->
+
+  <xs:element name='opvragenJournaalaantekeningMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='kenteken' type='xs:string' minOccurs='0' />
+
+        <!-- TODO: xs:choice -->
+        <!-- Bij een enkel lid direct het klantLidnummer invullen,
+        bij meerdere leden het wrapper element gebruiken -->
+        <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
+        <xs:element name='klantLidnummers' type='KlantLidnummersType' minOccurs='0' />
+        <!-- /xs:choice -->
+
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
 
   <xs:complexType name="KlantLidnummersType">
     <xs:sequence>
@@ -105,7 +181,12 @@
     </xs:simpleContent>
   </xs:complexType>
 
+
   <!--
+  - TODO: van wie naar wie? Zo te zien niet van Disel/wwdcs naar Alc.
+  -     Opruimen dan maa?
+  -->
+
   <xs:element name='opvragenIncidentGegevens'>
     <xs:complexType>
       <xs:all>
@@ -113,6 +194,14 @@
       </xs:all>
     </xs:complexType>
   </xs:element>
+
+
+  <!--
+  - Kennelijk antwoord op opvragenIncidentGegevens.
+  -
+  - TODO: van wie naar wie? Zo te zien niet van Alc naar Disel/wwdcs naar Alc.
+  -     Geen spoor van in Disel/wwdcs?
+  -->
 
   <xs:element name='antwoordenIncidentGegevens'>
     <xs:complexType>
@@ -126,25 +215,31 @@
       </xs:all>
     </xs:complexType>
   </xs:element>
-  -->
+
 
   <!--
-  - Response send from OBIcall to OBIweg.
-  - Het antwoord op het opvragen van journaalaantekeningen
+  - Bericht van Alc naar Weg.
+  - Antwoord op een opvragenJournaalaantekeningMessage.
   -->
-  <xs:complexType name='antwoordenJournaalaantekeningMessage'>
-    <xs:all>
-      <xs:element name='journaalAantekeningLijst' minOccurs='0'>
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name='journaalAantekening'
-              type='JournaalAantekening' minOccurs='0'
-                maxOccurs='unbounded' />
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:all>
-  </xs:complexType>
+
+  <xs:element name='antwoordenJournaalaantekeningMessage'>
+    <xs:complexType>
+      <xs:all>
+      <!-- (Beetje onhandig: een lijst binnen een "...Lijst".) -->
+        <xs:element name='journaalAantekeningLijst' minOccurs='0'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='journaalAantekening'
+                type='JournaalAantekening' minOccurs='0'
+                  maxOccurs='unbounded' />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
 
   <xs:complexType name='JournaalAantekening'>
     <xs:all>
@@ -158,9 +253,11 @@
     </xs:all>
   </xs:complexType>
 
+
   <!--
   - Het type van de journaal aantekening.
   -->
+
   <xs:simpleType name='JournaalAantekeningTypeEnum'>
     <xs:restriction base='xs:string'>
       <xs:enumeration value='J'/> <!-- Journaal Aanterkening-->
@@ -169,67 +266,98 @@
     </xs:restriction>
   </xs:simpleType>
 
+
+
   <!--
-  - Message send from OBIweg to OBIcall.
+  - Bericht van Weg naar Alc.
+  -
   - Het bericht waarin de gegevens staan zoals deze door de hulpverlener
-  - zijn gewijzigd of aangevuld. CARE krijgt alle info en bepaalt vervolgens
-  - welke wijzigingen automatisch worden verwerkt. Er kan voor woden gekozen om
+  - zijn gewijzigd of aangevuld. Alc krijgt alle info en bepaalt vervolgens
+  - welke wijzigingen automatisch worden verwerkt.Er kan voor worden gekozen om
   - sommige verwerkingen handmatig te laten gebeuren. Let wel dat bv.
   - contract- of lidmaatschapgegens bepalend kunnen zijn voor de wijze van
   - hulpverlening door de hulpverlener. Resultaat van de complete verwerking
-  - zijn relevant voordat de wegenwacht aan het sleutelen begint.
+  - zijn relevant voordat de wegewacht aan het sleutelen begint.
   -->
-  <xs:complexType name='completerenIncidentMessage'>
-    <xs:all>
-      <xs:element name='incidentnummer' type='xs:int'/>
-      <xs:element name='hulpverlenernummer' type='xs:int'/>
-      <xs:element name='taak' type='obi:TaakTypeEnum'/>
-      <xs:element name='hulpverlener' type='obi:Wegenwacht' minOccurs='0'/>
-      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
-      <xs:element name='locatie' type='obi:Locatie' minOccurs='0'/>
-      <xs:element name='voertuig' type='Voertuig' minOccurs='0'/>
-      <xs:element name='betaling' type='Betaling' minOccurs='0'/>
-      <xs:element name='arc-ait-gegevens' type='ARC-AIT-Gegevens'
-        minOccurs='0'/>
-    </xs:all>
-  </xs:complexType>
+
+  <xs:element name='completerenIncidentMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incidentnummer' type='xs:int'/>
+        <xs:element name='hulpverlenernummer' type='xs:int'/>
+        <!-- wegenwacht: minoccurs = 0 kan weggehaald worden zodra Weg 2.2
+             tegen Care 2.1/2.2 praat -->
+        <xs:element name='taak' type='obi:TaakTypeEnum'/>
+        <xs:element name='hulpverlener' type='obi:Wegenwacht' minOccurs='0'/>
+        <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
+        <xs:element name='locatie' type='obi:Locatie' minOccurs='0'/>
+        <xs:element name='voertuig' type='Voertuig' minOccurs='0'/>
+        <xs:element name='betaling' type='Betaling' minOccurs='0'/>
+        <xs:element name='arc-ait-gegevens' type='ARC-AIT-Gegevens'
+          minOccurs='0'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
 
   <!--
-  - Message send from OBIweg to OBIcall.
-  - Met dit bericht kan WEG de pechhistorie van een incidentopvragen
-  - bij CALL. DE pechhistorie bestaat uit de incidenten van de laatste
+  - Bericht van Weg naar Alc.
+  - Met dit bericht kan Weg de pechhistorie van een incident opvragen bij Alc.
+  - DE pechhistorie bestaat uit de incidenten van de laatste
   - twaalf maanden behorende bij een lidnummer en/of een kentken die ook
   - zijn uitgezet bij de WEG-organisatie (dit zijn de sleutelacties bij CARE).
+  -
+  - TODO: Gaat Lava pechhistorie ondersteunen? vermoedelijk niet.
   -->
-  <xs:complexType name='opvragenPechhistorieMessage'>
-    <xs:all>
-      <xs:element name='kenteken' type='xs:string' minOccurs='0'/>
-      <!-- xs:choice -->
-      <!-- Bij een lid direct het klantLidnummer invullen, bij meerdere leden het wrapper element gebruiken -->
-      <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
-      <xs:element name='klantLidnummers' type='KlantLidnummersType' minOccurs='0' />
-      <!-- /xs:choice -->
-    </xs:all>
-  </xs:complexType>
+
+  <xs:element name='opvragenPechhistorieMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='kenteken' type='xs:string' minOccurs='0'/>
+
+        <!-- xs:choice -->
+        <!-- Bij een lid direct het klantLidnummer invullen,
+        bij meerdere leden het wrapper element gebruiken -->
+        <xs:element name='klantLidnummer' type='xs:int' minOccurs='0'/>
+        <xs:element name='klantLidnummers' type='KlantLidnummersType' minOccurs='0' />
+        <!-- /xs:choice -->
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
 
   <!--
-  - Message send from OBIcall to OBIdis.
-  - Het antwoord op een aanvraag van pechhistorie wat kan
-  - bestaan uit de gegevens van enkele incidenten.
+  - Message send from Alc naar Weg.
+  -
+  - Weg vraagt pechhistorie op bij elk Alc systeem, en merged dit bij elkaar
+  - tot een lijst. Elk pechhistorie record kan
+  - oude of nieuwe pechcodes kunnen bevatten (maar niet beide).
   -->
-  <xs:complexType name='antwoordenPechhistorieMessage'>
-    <xs:all>
-      <xs:element name='pechhistorieLijst' minOccurs='0'>
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name='pechhistorie' type='Pechhistorie'
-              minOccurs='0' maxOccurs='unbounded' />
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:all>
-  </xs:complexType>
 
+  <xs:element name='antwoordenPechhistorieMessage'>
+    <xs:complexType>
+      <xs:all>
+      <!-- (Klungelig: een lijst binnen een "...Lijst". -->
+        <xs:element name='pechhistorieLijst' minOccurs='0'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='pechhistorie' type='Pechhistorie'
+                minOccurs='0' maxOccurs='unbounded' />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Onderdeel van bericht van Alc naar Weg (wwdcs).
+  - 
+  - Er wordt of de oude pechcode systematiek gebruikt (pechcode en afloopcode),
+  - of de nieuwe pechcode systematiek (opdrachtResultaten).
+  -->
   <xs:complexType name='Pechhistorie'>
     <xs:all>
       <xs:element name='incidentnummer' type='xs:int' />
@@ -237,39 +365,64 @@
       <xs:element name='datum' type='xs:date' />
       <xs:element name='kenteken' type='xs:string' minOccurs='0'/>
       <xs:element name='merk' type='xs:string' minOccurs='0' />
-      <xs:element name='pechcode' type='xs:string' />
+      <xs:element name='pechcode' type='xs:string'  minOccurs='0'/>
       <xs:element name='hulpverlenernummer' type='xs:int' />
       <xs:element name='mannummer' type='xs:int' />
       <xs:element name='transport' type='xs:boolean' />
-      <xs:element name='afloopcode' type='xs:int' />
+      <xs:element name='afloopcode' type='xs:int'  minOccurs='0'/>
       <xs:element name='lidnummer' type='xs:int' minOccurs='0' />
+      <xs:element name="opdrachtResultaten" type="obi:OpdrachtResultatenExtraType"
+            minOccurs="0"/>
     </xs:all>
   </xs:complexType>
+
 
   <!--
-  - Message send from OBIdis to OBIcall
-  - Met dit bericht kan WEG aan CALL melden of een opdracht
-  - wel of niet succescol is afgehandeld.
+  - Message send from Dis naar Alc.
+  -
+  - Met dit bericht meldt Dis dat het een incident heeft afgehandeld.
+  - Het incident verdwijnt daarmee uit Dis.
+  -
+  - Dit bericht wordt verstuurd als de laatste actieve opdracht van het
+  - incident door een hulpverlener wordt afgemeld.
   -->
-  <xs:complexType name='eindemeldenIncidentMessage'>
-    <xs:all>
-      <xs:element name='incidentnummer' type='xs:int' />
-      <!-- actienummer slaat op sleutelhulp en veiligstel gecombineerd -->
-      <xs:element name='actienummer'    type='xs:int' minOccurs='0' />
-      <xs:element name='transportActienummer' type='xs:int' minOccurs='0' />
 
-      <!--OBSOLETE: altijd einde: <element name='incidentstatus' type='obi:IncidentstatusEnum'/-->
-      <xs:element name='afloopcode'     type='obi:AfloopcodeEnum' />
-      <xs:element name='pechcode'       type='xs:int' />
-      <xs:element name='omschrijvingpechcode' type='xs:string' />
-      <!-- Q: Is er altijd WW info beschikbaar? -->
-      <xs:element name='hulpverlener' type='obi:Wegenwacht' />
-    </xs:all>
-  </xs:complexType>
+  <xs:element name='eindemeldenIncidentMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incidentnummer' type='xs:int' />
+
+        <!-- TODO: weer dat actienummer gedoe. -->
+        <!--
+        - Het actienummer is ingevuld als een sleuteltaak is afgemeld.
+        -->
+        <xs:element name='actienummer'    type='xs:int' minOccurs='0' />
+
+        <!--
+        - Het transportActienummer is ingevuld als een transporttaak is afgemeld.
+        -->
+        <xs:element name='transportActienummer' type='xs:int' minOccurs='0' />
+
+        <!-- Oude pechcode systematiek. -->
+        <xs:element name='afloopcode' type='obi:AfloopcodeEnum' minOccurs='0'/>
+        <xs:element name='pechcode' type='xs:int' minOccurs='0'/>
+        <xs:element name='omschrijvingpechcode' type='xs:string' minOccurs='0'/>
+
+        <!-- De hulpverlener die de laatste actieve opdracht afmeld. -->
+        <xs:element name='hulpverlener' type='obi:Wegenwacht' />
+
+        <!-- Nieuwe pechcode systematiek. -->
+        <xs:element name="opdrachtResultaten" type="obi:OpdrachtResultatenType"
+            minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
 
   <!--
   - Voertuig type t.b.v. completerenIncidentMessage
   -->
+
   <xs:complexType name='Voertuig'>
     <xs:all>
       <xs:element name='kenteken' type='xs:string' minOccurs='0' />
@@ -282,7 +435,7 @@
     </xs:all>
   </xs:complexType>
 
-  <!--
+
   <xs:complexType name='Incident'>
     <xs:all>
       <xs:element name='incidentnr' type='xs:int' minOccurs='0' />
@@ -291,9 +444,8 @@
       <xs:element name='type' type='xs:int' minOccurs='0' />
     </xs:all>
   </xs:complexType>
-  -->
 
-  <!--
+
   <xs:complexType name='Klant'>
     <xs:all>
       <xs:element name='voornaam' type='xs:string' minOccurs='0'/>
@@ -309,19 +461,17 @@
       <xs:element name='landcode' type='xs:string' minOccurs='0'/>
     </xs:all>
   </xs:complexType>
-  -->
 
-  <!--
+
   <xs:complexType name="Lidmaatschap">
     <xs:all>
       <xs:element name='anwbLidnummer' type='xs:string' minOccurs='0' />
-      <xs:element name='overeenkomstsoort' type='xs:string' minOccurs='0' />
-      <xs:element name='product' type='xs:string' minOccurs='0' />
+        <xs:element name='overeenkomstsoort' type='xs:string' minOccurs='0' />
+        <xs:element name='product' type='xs:string' minOccurs='0' />
     </xs:all>
   </xs:complexType>
-  -->
 
-  <!--
+
   <xs:complexType name='Melder'>
     <xs:all>
       <xs:element name='voornaam' type='xs:string' minOccurs='0'/>
@@ -337,7 +487,7 @@
       <xs:element name='geboorteDatumBerijder' type='xs:date' minOccurs='0'/>
       <xs:element name='geslacht' type='xs:string' minOccurs='0'/>
 
-      <-  label waarop is gebeld ->
+      <!--  label waarop is gebeld -->
       <xs:element name='label' type='xs:string' minOccurs='0'/>
 
       <xs:element name='straat' type='xs:string' minOccurs='0'/>
@@ -348,9 +498,8 @@
       <xs:element name='landcode' type='xs:string' minOccurs='0'/>
     </xs:all>
   </xs:complexType>
-  -->
 
-  <!--
+
   <xs:complexType name='Contract'>
     <xs:all>
       <xs:element name='arcid' type='xs:int' minOccurs='0' />
@@ -364,11 +513,12 @@
       <xs:element name='afwentelContractMaatschappijCode' type='xs:string' minOccurs='0' />
     </xs:all>
   </xs:complexType>
-  -->
+
 
   <!--
   - Gegevens m.b.t. een betaling van een klant aan de hulpverlener.
   -->
+
   <xs:complexType name='Betaling'>
     <xs:all>
       <xs:element name='betaald' type='xs:boolean' minOccurs='0' />
@@ -381,6 +531,7 @@
     </xs:all>
   </xs:complexType>
 
+
   <xs:simpleType name='BetalingWijzeEnum'>
     <xs:restriction base='xs:string'>
       <xs:enumeration value='Contant' />
@@ -388,6 +539,7 @@
       <xs:enumeration value='Krediet' />
     </xs:restriction>
   </xs:simpleType>
+
 
   <!--
   - Deze gegevens zijn benodigd voor o.a. helpverlening
@@ -403,25 +555,72 @@
     </xs:all>
   </xs:complexType>
 
+
   <!--
   - Rijksdriehoekscoordinaten, in meters.
   -->
-  <!--
   <xs:complexType name='Coordinaat'>
     <xs:all>
       <xs:element name='x' type='xs:long' />
       <xs:element name='y' type='xs:long' />
     </xs:all>
   </xs:complexType>
+
+
+  <!--
+  - De status van een incident of taak (opdracht).
   -->
 
   <xs:simpleType name='StatusEnum'>
     <xs:restriction base='xs:string'>
+
+      <!--
+      - Incident is OPEN, dwz niet toegewezen aan een hulpverlener.
+      -->
       <xs:enumeration value='open'/>
-      <xs:enumeration value='verzonden'/> <!--verzonden aan hv -->
-      <xs:enumeration value='aanrijden'/> <!--geaccepteerd door hv -->
+
+      <!--
+      - Een toewijzing is verzonden aan een hulpverlener, maar deze heeft
+      - nog niet geaccepteerd.
+      -->
+      <xs:enumeration value='verzonden'/>
+
+      <!--
+      - De hulpverlener heeft de toewijzing geaccepteerd en is nu
+      - in de status aanrijden.
+      -->
+      <xs:enumeration value='aanrijden'/>
+
+      <!--
+      - De hulpverlener is gearriveerd bij het pechvoertuig en
+      - heeft gemeldt dat hij begonnen is met "uitvoeren".
+      -->
       <xs:enumeration value='uitvoeren'/>
+
+      <!--
+      - Alleen naar Lava, en alleen als het een transport betreft waarbij
+      - de inzittenden zijn "afgeleverd".
+      - De hulpverlener blijft in uitvoeren en is bezig met het wegbrengen
+      - van het pechvoertuig.
+      -->
+      <xs:enumeration value='inzittenden'/>
+
+      <!--
+      - Alleen naar Lava, en alleen als het een transport betreft waarbij
+      - het pechvoertuig is "afgeleverd".
+      - De hulpverlener blijft in uitvoeren en is bezig met het wegbrengen
+      - van de inzittenden.
+      -->
+      <xs:enumeration value='voertuig'/>
+      
+      <!--
+      - TODO: Gaat dit ooit naar buiten?
+      -->
       <xs:enumeration value='einde'/>
+
+      <!--
+      - TODO: Gaat dit ooit naar buiten?
+      -->
       <xs:enumeration value='geannuleerd'/> <!-- taak geannuleerd -->
     </xs:restriction>
   </xs:simpleType>

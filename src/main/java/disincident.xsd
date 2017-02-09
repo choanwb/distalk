@@ -1,26 +1,48 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<!--============================================================================
-- TODO, QUESTION: Er zitten TODO's en QUESTION's in dit schema!!!
-=============================================================================-->
-
-
 <!--
-- Berichten die naar OBIdis gestuurd worden, voornamelijk door OBIcall.
-- Ook de antwoordberichten die OBIdis terug stuurt staan in dit
-- schema.
+- Berichten die naar Dis(patch) gestuurd worden, voornamelijk door Care, Flow,
+- en Lava (Logicx) voor het aanmelden en wijzigen van "incidenten" met
+- veiligstel-, en/of sleutel-, en/of transport-opdrachten.
+- (Excis (Logicx) meldt nog transportaanvragen aan via LogicxDis.xsd.)
 -
-- OBIcall identificeerd incidenten richting OBIdis met een
-- incident nummer en een actie nummer. OBIdis moet beide nummers repliceren
-- in alle (antwoord-)berichten richting OBIcall.
+- Als het onderscheid niet belangrijk is worden Care, Flow, en Lava (Logicx) ook
+- wel gezamelijk aangeduidt als Alc (Alarmcentrale (applicatie)).
+-
+- Ook de onmiddelbare antwoordberichten die Dis terug stuurt staan in dit schema.
+-
+- Dit schema is oorspronkelijk opgezet voor het berichtenverkeer van
+- Care naar Dis. Later is daar Flow als incidentaanmelder bijgekomen,
+- aanvankelijk net als Care voor veiligstel- en sleutelopdrachten. Nog later
+- ook voor transportoprachten aan MFV (Multi-Functional Voertuigen).
+-
+- Begin 2017 is Lava toegevoegd voor transportopdrachten aan lepels.
+- T.z.t. zal Lava de MFV transportopdrachten overnemen van Flow.
+-
+- Care, FLow, en Lava identificeren incidenten richting Dis met een
+- incidentnummer. Dit incidentnummer moet over Alc-applicaties heen, en
+- over alle tijd heen, uniek zijn. (Dit vereist enige coordinatie of afspraak
+- tussen de Alc-organisaties).
+- Dit incidentnummer is voor dispatch de primary key van het incident.
+-
+- Care en Flow indentificeren opdrachten binnen een incident met een
+- "actienummer". Dit nummer is voor Dis een don't care. Dis echoed dit
+- nummer in berichten naar Care en Flow.
+-
+- Lava identificeerd incidenten en (transport-)opdrachten met TBD
+- TBD: logicxreferentie?
+- Deze gegevens zijn voor Dis don't cares. Dis echoed deze referenties in
+- berichten naar Lava.
 -
 - Instanties van het type xs:dateTime moeten in Zulu-tijd of met een
 - tijdzone offset van 0; dwz het moeten GMT of UTC tijden zijn.
 - Voorbeelden: "2004-02-10T10:30:00Z" en "2004-02-10T10:30:00+00:00".
 -
-- TBD:
-- (1) Uit elkaar trekken conform communicatierichting? Waarschijnlijk beter
--     van wel!
+- "X, Y" coordinaten zijn het in Nederlandse Rijksdriehoeksstelsel (RDM),
+- in (hele) meters. "Lat, Long" coordinaten worden volgens TODO gespecificeerd.
+-
+- Optionele boolean attributen en elementen hebben default de waarde false.
+- Optionele int attributen en elementen hebben default de waarde 0.
 -->
 
 <xs:schema
@@ -28,212 +50,215 @@
   targetNamespace='http://anwb.org/hv/ict/oxi/disinc'
   xmlns:xs='http://www.w3.org/2001/XMLSchema'
   xmlns:obi='http://anwb.org/hv/ict/oxi/obi'
-  elementFormDefault='qualified'>
+  elementFormDefault='qualified'
+  >
 
   <xs:import namespace='http://anwb.org/hv/ict/oxi/obi'/>
 
-  <!--
-  - Van OBIcall naar OBIdis om een nieuw ingevoerd incident aan te
-  - melden. OBIdis stuurt een Resultaat message terug.
-  -->
-  <xs:complexType name='aanmeldenIncidentMessage'>
-    <xs:all>
-      <xs:element name='incident' type='Incident'/>
-    </xs:all>
-  </xs:complexType>
 
   <!--
-  - Van OBIcall naar OBIdis om een reeds aangemeld incident te wijzigen.
-  - OBIdis stuurt een Resultaat message terug.
-  -->
-  <xs:complexType name='wijzigenIncidentMessage'>
-    <xs:all>
-      <xs:element name='incident' type='Incident'/>
-    </xs:all>
-  </xs:complexType>
-
-  <!--
-  - Van OBIcall naar OBIdis om aan te geven dat er de klant is gebeld voor een
-  - wachttijd overschrijding (stel actie).
-  - OBIcall verwacht geen antwoord terug (zelfs geen ack of ok)
-  - (STEL: Service TELefoniste.)
-  -->
-  <xs:complexType name='stelMessage'>
-    <xs:all>
-      <!-- De incident indentificatie. -->
-      <xs:element name='incidentnummer' type='xs:int'/>
-      <xs:element name='actienummer' type='xs:int'/>
-
-      <!-- Voorlopig maar even aannemen dat het hier
-      om minuten gaat. -->
-<!--
-TODO: omzetten naar xs:duration
--->
-      <xs:element name='nieuweWachttijd' type='xs:int'/>
-    </xs:all>
-  </xs:complexType>
-
-  <!--
-  - Van OBIcall naar OBIdis om een reeds aangemeld incident af te melden.
-  - OBIdis stuurt een <Resultaat> bericht terug.
-  -->
-  <xs:complexType name='afmeldenIncidentMessage'>
-    <xs:all>
-      <!-- De incident indentificatie. -->
-      <xs:element name='incidentnummer' type='xs:int'/>
-
-      <!-- actienummer wordt genegeerd door DIS (afgezien van logging), verwijderen in toekomstige release -->
-      <!-- Care/Flow mag pas een afmelden bericht sturen als alle DIS acties ten einde zijn -->
-      <xs:element name='actienummer' type='xs:int' minOccurs='0'/>
-    </xs:all>
-  </xs:complexType>
-
-  <!--
-  - Request van OBIcall naar OBIdis voor het opvragen planningsinfo.
-  - OBIcall verwacht een <antwoordenPlanningsinfoMessage> reply terug.
-  -->
-  <xs:complexType name='opvragenPlanningsinfoMessage'>
-    <xs:all>
-      <xs:element name='incident' type='Incident'/>
-    </xs:all>
-  </xs:complexType>
-
-  <!--
-  - Reply van OBIdis naar OBIcall
-  - in antwoord op een <OpvragenPlanningsinfo>.
-  -->
-  <xs:complexType name='antwoordenPlanningsinfoMessage'>
-    <xs:all>
-      <xs:element name='incidentnummer' type='xs:int'/>
-      <xs:element name='actienummer' type='xs:int'/>
-      <xs:element name='taak' type='obi:TaakTypeEnum'/>
-
-      <!-- HMMM: xs:int. Voorlopig maar even aannemen dat het hier
-      om minuten gaat. TODO: omzetten naar xs:duration -->
-      <xs:element name='geschatteWachttijd' type='xs:int'/>
-
-      <!-- HMMM: Kan OBIdis uberhaupt iets zeggen over de (theoretisch
-      gehanteerde plannings methode. -->
-      <xs:element name='planningsmethode' type='PlanningsmethodeEnum'/>
-
-      <xs:element name='faserood' type='FaseroodEnum'/>
-    </xs:all>
-  </xs:complexType>
-
-  <!--
-  - Push van OBIdis naar OBIcall
-  -->
-  <xs:complexType name='planningsinfoMessage'>
-    <xs:all>
-      <xs:element name='incidentnummer' type='xs:int'/>
-      <xs:element name='actienummer' type='xs:int'/>
-      <xs:element name='taak' type='obi:TaakTypeEnum'/>
-
-      <!-- HMMM: xs:int. Voorlopig maar even aannemen dat het hier
-      om minuten gaat. TODO: omzetten naar xs:duration -->
-      <xs:element name='geschatteWachttijd' type='xs:int'/>
-
-      <!-- HMMM: Kan OBIdis uberhaupt iets zeggen over de (theoretisch
-      gehanteerde plannings methode. -->
-      <xs:element name='planningsmethode' type='PlanningsmethodeEnum'/>
-
-      <xs:element name='faserood' type='FaseroodEnum'/>
-    </xs:all>
-  </xs:complexType>
-
-  <!--
-  - Van OBIcall naar OBIdis: opvragen opdracht info.
-  - Het antwoord is een <antwoordenOpdrachtinfoMessage> bericht.
-  -->
-  <xs:complexType name='opvragenOpdrachtinfoMessage'>
-    <xs:attribute name='incidentnummer' type='xs:int' use='required'/>
-    <xs:attribute name='actienummer' type='xs:int' use='required'/>
-  </xs:complexType>
-
-  <!--
-  - Van OBIdis naar OBIcall in antwoord op een opvragenOpdrachtinfoMessage
-  - request.
-  -->
-  <xs:complexType name='antwoordenOpdrachtinfoMessage'>
-    <xs:all>
-      <xs:element name='opdrachten' type='OpdrachtenType' minOccurs='0'/>
-      <!-- Q: Moet inzetType niet onderdeel zijn van OpdrachtenType? Maar moet ook verplicht zijn? -->
-    </xs:all>
-    <xs:attribute name='incidentnummer' type='xs:int' use='required'/>
-    <xs:attribute name='actienummer' type='xs:int' use='required'/>
-  </xs:complexType>
-
-  <!--
-  - Een lijst van opdrachten.
-  -->
-  <xs:complexType name='OpdrachtenType'>
-    <xs:sequence>
-      <xs:element name='opdracht' type='Opdracht' minOccurs='0' maxOccurs='unbounded'/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <!--
-  - BevestigingNAWGegevens is het bericht dat CALL naar WEG stuurt als CALL een
-  - voorstel krijgt van Logicx. Het zijn de naw gegevens van de externe door
-  - Logicx ingeschakeld.
+  - Verzoek van Alc naar Dis voor het opvragen planningsinfo.
   -
-  - TODO, QUESTION: Wat is voor een bericht? Waarom zit het in DisIncident?
-  - Dit bericht is blijkbaar het zelfde als
-  - WegTekstbericht::bevestigingLogicxMessage?
+  - Alc krijgt een antwoordenPlanningsinfoMessage terug.
+  -
+  - Alc mag, maar is niet verplicht, dit bericht te sturen voor (before) een
+  - aanmeldenIncidentMessage. Dis berekent een geschatte wachttijd o.b.v.
+  - de huidige drukte bij Dispatch, die Alc dan kan meedelen aan de klant
+  - (die dan vermoedelijk nog "aan de lijn hangt".)
+  - In de praktijk sturen Care en Flow eerst een opvragenPlanningsinfoMessage,
+  - kort daarop gevolgd door een aanmeldenIncidentMessage). 
+  -
+  - Dit bericht heeft verder geen gevolgen in Dis; er wordt niets opgeslagen of
+  - gewijzigd. Incident- en actie-nummers en andere referentiegegevens moeten,
+  - voorzover dit schema ze verplicht stelt, wel met "iets" worden ingevuld,
+  - maar worden door Dis geignoreerd. 
   -->
-  <xs:element name='bevestigingNAWGegevensMessage'>
+
+  <xs:element name='opvragenPlanningsinfoMessage'>
     <xs:complexType>
       <xs:all>
-        <xs:element name='incidentnummer' type='xs:int'/>
-        <xs:element name='naam' type='xs:string'/>
-        <xs:element name='plaats' type='xs:string'/>
-        <xs:element name='straat' type='xs:string'/>
-        <xs:element name='huisnummer' type='xs:int'/>
-        <xs:element name='telefoonnummer' type='xs:string'/>
-        <xs:element name='datumaankomst' type='xs:dateTime' minOccurs='0'/>
+        <xs:element name='incident' type='Incident'/>
       </xs:all>
     </xs:complexType>
   </xs:element>
 
+
   <!--
-  - Resultaat antwoord door OBIdis naar OBIcall teruggestuurd.
+  - Van Dis naar Alc.
+  - Antwoord op een OpvragenPlanningsinfo.
   -->
-  <xs:complexType name='Resultaat'>
-    <xs:sequence>
-      <!-- Code=0 betekent dat het request verwerkt/geaccepteerd is.
-      Elke waarde !=0 is een foutcode. -->
-      <xs:element name='code' type='xs:int'/>
 
-      <!-- Bij een fout-resultaat (code!=0) zou ook een error
-      string meegegeven moeten worden. De ontvanger mag hier echter
-      niet op rekenen. -->
-      <xs:element name='msg' type='xs:string' minOccurs='0'/>
-    </xs:sequence>
-  </xs:complexType>
+  <xs:element name='antwoordenPlanningsinfoMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incidentnummer' type='xs:int'/>
+        <xs:element name='actienummer' type='xs:int'/>
+        <xs:element name='taak' type='obi:TaakTypeEnum'/>
+
+        <!-- Geschatte wachttijd in minuten. -->
+        <xs:element name='geschatteWachttijd' type='xs:int'/>
+
+        <!-- TODO: Kan OBIdis uberhaupt iets zeggen over de (theoretisch
+        gehanteerde plannings methode. -->
+        <xs:element name='planningsmethode' type='PlanningsmethodeEnum'/>
+
+        <xs:element name='faserood' type='FaseroodEnum'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
 
   <!--
-  - BEWARE: Dit element wordt gebruikt zowel voor het aanmelden als het
-  - wijzigen van een incident. Bij het aanmelden zijn een aantal
-  - subelementen verplicht die strikt genomen volgens dit schema optioneel
-  - zijn.
+  - Van Alc naar Dis voor het aanmelden van een incident met veiligstel-,
+  - en/of sleutel-, en/of transport-opdracht.
   -
-  - (TBD: Dit is feitelijk een dump van een OBIcall domein object.
-  - Veel velden zijn voor OBIdis niet relevant en zouden dan ook niet
-  - in dit element moeten staan.)
+  - Dis stuurt meteen een Resultaat bericht terug.
+  -
+  - Met een wijzigenIncidentMessage kan later een incident gewijzigd worden.
   -->
+
+  <xs:element name='aanmeldenIncidentMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incident' type='Incident'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Van Alc naar Dis voor het wijzigen van eerder aangemeld incident.
+  - Een wijzigingsbericht kan bestaande opdrachten wijzigingen, maar
+  - b.v. ook een transportopracht toevoegen aan een sleutelincident.
+  -
+  - Dis stuurt meteen een Resultaat message terug.
+  -->
+
+  <xs:element name='wijzigenIncidentMessage'>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name='incident' type='Incident'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Van Alc naar Dis om een reeds aangemeld incident af te melden.
+  -
+  - Dis stuurt meteen een Resultaat bericht terug.
+  -->
+
+  <!-- TODO: nog eens controlleren of/wat DIS hier iets mee doet.
+  immers, als alle acties einde zijn, dan zal/heeft dis het incident
+  inmiddels verwijdert. Dit bericht komt dan als mosterd na de maaltijd. -->
+
+  <xs:element name='afmeldenIncidentMessage'>
+    <xs:complexType>
+      <xs:all>
+        <!-- De incident indentificatie. -->
+        <xs:element name='incidentnummer' type='xs:int'/>
+
+        <!-- actienummer wordt genegeerd door DIS (afgezien van logging),
+        TODO: verwijderen in toekomstige release -->
+        <!-- Care/Flow mag pas een afmelden bericht sturen als alle DIS
+        acties ten einde zijn. In andere gevallen weigert DIS de afmelding.
+        -->
+        <xs:element name='actienummer' type='xs:int' minOccurs='0'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Van Dis naar Alc.
+  -
+  - Antwoord op een aanmeldenIncidentMessage, wijzigenIncidentMessage,
+  - afmeldenIncidentMessage.
+  -->
+
+  <xs:element name='Resultaat'>
+    <xs:complexType>
+      <xs:sequence>
+
+        <!-- TODO: Referentiegegevens (incnr, etc) mee terug sturen? -->
+
+        <!--
+        - Code=0 betekent dat een aanmeldenIncidentMessage, wijzigenIncidentMessage,
+        - of afmeldenIncidentMessage conform afspraken verwerkt is.
+        -
+        - Elke waarde !=0 is een foutcode.
+        - Er zijn thans geen nadere afsprake over specifieke foutcodes.
+        -->
+        <xs:element name='code' type='xs:int'/>
+
+        <!--
+        - Bij een fout-resultaat (code!=0) zou ook een error string meegegeven
+        - moeten worden. De ontvanger mag hier echter niet op rekenen.
+        - Er zijn thans geen nadere afsprake over specifieke foutmeldingen.
+        -->
+        <xs:element name='msg' type='xs:string' minOccurs='0'/>
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Dit type wordt gebruikt zowel voor het aanmelden als het wijzigen van een
+  - een reeds eerder aangemeld incident.
+  -
+  - HMMM: Bij het aanmelden zijn een aantal subelementen verplicht die strikt
+  - genomen volgens dit schema optioneel zijn. (M.a.w. om dit type voor wijzigen
+  - te hergebruiken is het voor aanmelden "opgeweekt.)
+  -->
+
   <xs:complexType name='Incident'>
     <xs:all>
-      <!-- Het dagelijkse volgnummer. -->
+      <!--
+      - Het dagelijkse volgnummer. Dit attribuut mag na aanmelden niet
+      - gewijzigd worden.
+      -
+      - TODO: Bij logicxdis:AanvraagLepel zal disel's AanvraagLepelCommand
+      -     zelf een volgnr bepalen. Willen we dat zo houden voor Excis
+      -     transporten dan moeten we volgnummer optioneel maken.
+      -->
       <xs:element name='volgnummer' type='xs:int'/>
 
-      <xs:element name='LBIClassificatie' type='LbiClassificatieType' minOccurs='0'/>
+      <!--
+      - Een willekeurig door aanmelder in te vullen referentie.
+      -->
+      <xs:element name='referentie' type="obi:String32" minOccurs='0'/>
 
-      <!-- Verplicht bij aanmelden. -->
+      <!--
+      - Lbi classificatie.
+      -
+      - TODO: Bij logicxdis:AanvraagLepel zal disel's AanvraagLepelCommand
+      -     dit op 0 ("gewoon") zetten.
+      -->
+      <xs:element name='LBIClassificatie' type='LbiClassificatieType'
+        minOccurs='0'/>
+
+      <!--
+      - Tijdstip melding. Ook bekend als tijdstip acceptatie.
+      - Tijdtip waarop het incident in Alc geregistreerd is.
+      -
+      - Verplicht bij aanmelden.
+      -
+      - TODO: Bij logicxdis:AanvraagLepel zal disel's AanvraagLepelCommand
+      -     dit op "nu" zetten, dus het tijdstip waarop disel de aanvraag verwerkt.
+      -->
       <xs:element name='tijdstipMelding' type='xs:dateTime' minOccurs='0'/>
 
-      <!-- Incident type. OBIdis maakt (op dit moment) alleen
-      onderscheid tussen ongevallen en pechgevallen.
-      Dit veld is verplicht bij het aanmelden van een incident. -->
+      <!--
+      - Incident type. Dis onderscheidt tussen ongevallen en pechgevallen.
+      - Ongevallen worden niet automatisch ingepland.
+      -
+      - Verplicht bij aanmelden.
+      -
+      - TODO: Bij logicxdis:AanvraagLepel zal disel's AanvraagLepelCommand
+      -     dit op 'Pechgeval' zetten.
+      -->
       <xs:element name='type' minOccurs='0'>
         <xs:simpleType>
           <xs:restriction base='xs:string'>
@@ -243,37 +268,136 @@ TODO: omzetten naar xs:duration
         </xs:simpleType>
       </xs:element>
 
-      <!-- Bij aanmelden moeten tijdstipAfspraakVan en tijdstipAfspraakTot
-      beide wel, of beide niet gebruikt worden. -->
+      <!--
+      - Bij afspraakincidenten moet bij aanmelden tijdstipAfspraakVan en
+      - tijdstipAfspraakTot aanwezig zijn.
+      - Bij niet-afspraakincidenten mogen bij aanmelden geen van beide
+      - aanwezig zijn.
+      -
+      - M.a.w. bij aanmelden moeten tijdstipAfspraakVan en tijdstipAfspraakTot
+      - beide wel, of beide niet gebruikt worden. Het is de aanwezigheid van
+      - de waardes die bepaald of we met een afspraakincident te maken hebben.
+      -
+      - Lava mag geen "transport-afspraak-incidenten" aanmelden.
+      -->
       <xs:element name='tijdstipAfspraakVan' type='xs:dateTime' minOccurs='0'/>
       <xs:element name='tijdstipAfspraakTot' type='xs:dateTime' minOccurs='0'/>
+
+      <!--
+      - Alleen (zinvol) in wijzigingsberichten.
+      - Tijdstip waarop een Serive Telefoniscte (STEL) het laatst
+      - (telefonisch) contact gehad heeft met de klant.
+      -->
       <xs:element name='tijdstipStelcontact' type='xs:dateTime' minOccurs='0'/>
+
+      <!--
+      - Binnen dis bekend als "prio-bijzonderheden" of "categorie3".
+      - ("Categorie3" niet te verwarren met lbi3.)
+      - Bevat een voor de planner of wegenwacht leesbare omschrijving
+      - van de reden van voorrang. (B.v.: "baby aan boord", "moet naar een
+      - begrafinis".)
+      -
+      - Incidenten waarbij dit attribuut gezet is worden niet
+      - automatisch ingepland.
+      -
+      - TODO: Lava transportincidenten? Die worden op aanwijzing van Logicx
+      -     toegewezen. We zouden dus hier zonder ploblemen een waarde
+      -     kunnen toestaan.
+      -->
       <xs:element name='voorrangsregel' type='xs:string' minOccurs='0'/>
 
+      <!--
+      - Bevat een voor de planner of wegenwacht leesbare mededeling.
+      -->
       <xs:element name='incidentbijzonderheid' type='xs:string' minOccurs='0'/>
 
+      <!--
+      - Bevat een omschrijving van de pech zoals "Start niet", of
+      - "De versnellingsbak doet raar".
+      -
+      - Op dit moment hebben een beperkt aantal omschrijving voor Dis een
+      - bijzondere betekenis:
+      -
+      -     (1) "Geen brandstof"" en "Lekke band". In dit geval is er volgens
+      -         regels van Dis sprake van een simpele storing, en volgt bij 
+      -         lbi3 incidenten een speciale afhandeling.
+      -
+      -     (2) "Verkeerde brandstof". In dit geval mag bij automatische planning
+      -         alleen een wegenwacht met een verkeerdgetankt-installatie
+      -         toegewezen worden.
+      -
+      -     (3) "Lepelsleep / Veiligstellen": TBD
+      -->
       <xs:element name='storingscode' type='xs:string' minOccurs='0'/>
+
+      <!--
+      - Bevat een voor de planner of wegenwacht leesbare mededeling.
+      -->
       <xs:element name='storingsbijzonderheid' type='xs:string' minOccurs='0'/>
 
-      <!-- later komt in plaats van een boolean de naam van het Evenement -->
+      <!--
+      - Staat het pechvoertuig bij een evenement (bv TT Assen) ?
+      -->
       <xs:element name='evenement' type='xs:boolean' minOccurs='0'/>
 
       <!--
       - Bij aanmelden is een locatie met (x,y) en wegtype verplicht, en
       - is de locatie omschrijving gewenst.
+      -
+      - Bij LBI3 incidenten is dit (aanvankelijk) de onveilige LBI3
+      - locatie. Hiervan moet het voertuig worden veiliggesteld naar
+      - 'veiligstellocatie'.
       -->
       <xs:element name='locatie' type='Locatie' minOccurs='0'/>
-      <xs:element name='sleutelOpdracht' type='SleutelOpdracht' minOccurs='0' />
-      <xs:element name='veiligstelOpdracht' type='VeiligstelOpdracht' minOccurs='0'/>
-      <xs:element name='transportOpdracht' type='TransportOpdracht' minOccurs='0'/>
 
+      <xs:element name='sleutelOpdracht' type='SleutelOpdracht' minOccurs='0' />
+
+      <!--
+      - Bij aanmelden moet bij incidenten met een LBI-classificatie 2 of 3
+      - een veiligstellocatie worden meegegeven.
+      - Dit is de locatie waarnaar LBI3 incidenten moeten worden veiliggesteld.
+      -
+      - DEPRECATED: Gebruik veiligstelOpdracht/{locatie,servicestation}.
+      -     Care doet dit al. Flow gebruikt kennelijk beide!
+      -->
+      <xs:element name='veiligstellocatie' type='Veiligstellocatie' minOccurs='0'/>
+
+      <!--
+      - Nadere informatie over de veiligstelOpdracht.
+      - W.o. de locatie waarnaar veiliggesteld moet worden.
+      - Bij het aanmelden van veiligstelopdrachten verplicht.
+      -->
+      <xs:element name='veiligstelOpdracht' type='VeiligstelOpdracht' minOccurs='0'/>
+
+      <!--
+      - Type van het pechvoertuig.
+      -
+      - Als het voertuig een truck is dan wordt in Dis de tsov-code
+      - van het pechvoertuig op 'T' gezet. Dit heeft gevolgen voor de
+      - automatische planning.
+      -->
       <xs:element name='voertuig' type='obi:Voertuig' minOccurs='0'/>
+
+      <!--
+      - Is er een journaalaantekening?
+      -->
       <xs:element name='journaalAantekening' type='xs:boolean' minOccurs='0'/>
+
+      <!--
+      - Is er een kritische journaalaantekening?
+      - Dis zal incidenten met een kritische journaalaantekening niet
+      - automatische inplannen.
+      -->
       <xs:element name='kritischeJournaalaantekening' type='xs:boolean' minOccurs='0'/>
+
+      <!--
+      - Is voor de klant of voertuig pechhistorie bekend?
+      -->
       <xs:element name='pechhistorie' type='xs:boolean' minOccurs='0'/>
 
-      <!-- Dit is het mannummer van de vindende hulpverlener.
-      (Dus niet het hvnr or persnr.) -->
+      <!--
+      - Dit is het mannummer van de vindende hulpverlener.
+      -->
       <xs:element name='gevondenDoorHulpverlener' type='xs:int' minOccurs='0'/>
 
       <xs:element name='aantalGewonden' type='xs:int' minOccurs='0'/>
@@ -281,10 +405,26 @@ TODO: omzetten naar xs:duration
       <xs:element name='verkeersgevaarlijk' type='xs:boolean' minOccurs='0'/>
       <xs:element name='gevaarlijkeStoffen' type='xs:boolean' minOccurs='0'/>
       <xs:element name='betaaldeHulpverlening' type='xs:boolean' minOccurs='0'/>
+
+      <!--
+      - Een incident met deze classificatie krijgt categorie GEVAAR en
+      - wordt niet automatische ingepland.
+      -->
       <xs:element name='voorrangsclassificatie2' type='xs:boolean' minOccurs='0'/>
+
+      <!--
+      - Verscheidene attributen die voor zichzelf spreken.
+      -->
       <xs:element name='hulpverlenersGebeld' type='xs:boolean' minOccurs='0'/>
       <xs:element name='rijbaanGeblokkeerd' type='xs:boolean' minOccurs='0'/>
+
+      <!--
+      - Informatie over degene die het incident bij Alc heeft aangemeldt.
+      - Komt veelal als klant (zie hieronder) terug.
+      -->
       <xs:element name='melder' type='obi:Melder' minOccurs='0'/>
+
+      <xs:element name='transportOpdracht' type='TransportOpdracht' minOccurs='0'/>
 
       <xs:element name='klanten' minOccurs='0'>
         <xs:complexType>
@@ -294,100 +434,231 @@ TODO: omzetten naar xs:duration
         </xs:complexType>
       </xs:element>
 
-      <!-- TBD: Het lijkt nogal onzinnig dat OBIcall aan OBIdis
-      een geschatte wachttijd meegeeft. -->
+      <!--
+      - TBD: Het lijkt nogal onzinnig dat Alc aan Dis een geschatte wachttijd meegeeft.
+      -
+      - DEPRECATED: Wordt kennelijk door Care en Flow niet meer gebruikt;
+      -     en zowiezo door Dis geignoreerd.
+      -->
       <xs:element name='geschattewachttijd'
         type='xs:duration' minOccurs='0'/>
 
-      <!-- TBD: Het lijkt nogal onzinnig dat OBIcall aan OBIdis een
-      (gewenste?) planninsmethode meegeeft. -->
+      <!--
+      - TBD: Het lijkt nogal onzinnig dat OBIcall aan OBIdis een
+      - (gewenste?) planninsmethode meegeeft.
+      -
+      - DEPRECATED: Dit gegeven wordt door Dis geignoreerd.
+      -->
       <xs:element name='planningsmethode' type='PlanningsmethodeEnum' minOccurs='0'/>
 
-      <!-- Woonplaatsservice? -->
+      <!--
+      - Woonplaatsservice?
+      -
+      - DEPRECATED: Dit gegeven wordt door Dis geignoreerd.
+      -     De vervanger is klanten/klant/wps.
+      -->
       <xs:element name='wps' type='xs:boolean' minOccurs='0'/>
 
     </xs:all>
 
-    <!-- NB: "nummer" is incidentnummer. -->
+    <!-- Het incidentnummer. -->
     <xs:attribute name='nummer' type='xs:int' use='required'/>
     
+    <!-- Alleen nog t.b.v. unit testen, die overigens al aangepast hadden moeten zijn. -->
+    <xs:attribute name='actienummer' type='xs:int'/>
+
   </xs:complexType>
-  
+
+
+  <!--
+  - Gegevens specifiek voor een veiligstelopdracht.
+  -->
+
+  <xs:complexType name='VeiligstelOpdracht'>
+    <xs:all>
+      <!--
+      - N.B. Incident/locatie is de lbi3 locatie waarvandaan
+      - het lbi3 incident veiligsteld moet gaan worden.
+      -->
+
+      <!-- De locatie waarna veiliggesteld gaat worden. -->
+      <xs:element name='locatie' type='Locatie'/>
+
+      <!-- Er moet  aangegeven worden of de locatie waarna veiliggesteld gaat
+      worden een het een ANWB Dispatch service station betreft. -->
+      <xs:element name='servicestation' type='xs:boolean'/>
+    </xs:all>
+
+    <!-- Het actienummer van het deze opracht. Dit is een Alc-referentie. -->
+    <xs:attribute name="actienummer" type="xs:int" use="required" />
+  </xs:complexType>
+
+
+  <!--
+  - Gegevens specifiek voor een sleutelopdracht.
+  -
+  - Opmerking: er zitten nog steeds gegevens in Incident die strikt genomen
+  - betrekking hebben op de sleutelopdracht en die we t.z.t. willen
+  - verplaatsen naar SleutelOpdracht. Bij verplaatsing worden ze eerst
+  - hieronder toegevoegd en in Incident optioneel gemaakt. Bij het gegeven
+  - in Incident wordt dan de aanwijzing toegevoegd (commentaar) van het
+  - gegeven hieronder gebruikt.
+  -->
+
   <xs:complexType name='SleutelOpdracht'>
     <xs:all />
     <xs:attribute name="actienummer" type="xs:int" use="required" />
   </xs:complexType>
 
-  <xs:complexType name='VeiligstelOpdracht'>
-    <xs:all>
-      <!-- De locatie. -->
-      <xs:element name='locatie' type='Locatie'/>
 
-      <!-- Er moet  aangegeven worden of het een service station betreft. -->
-      <xs:element name='servicestation' type='xs:boolean'/>
-    </xs:all>
-    <!-- Verplicht bij nieuwe incidenten die dit niet meer op incident niveau meegeven -->
-    <xs:attribute name="actienummer" type="xs:int" use="required" />
-  </xs:complexType>
-
+  <!--
+  - Gegevens specifiek voor een transportopdracht.
+  -->
   <xs:complexType name='TransportOpdracht'>
     <xs:all>
       <!-- momentane incident locatie wordt gebruikt als laadlocatie -->
+
       <xs:element name='bestemmingLocatieVoertuig' type='Locatie' />
       <xs:element name='bestemmingLocatieInzittenden' type='Locatie' />
       <xs:element name='volgorde' type='TransportVolgordeEnum' />
+
+      <xs:element name='aantalKilometers' type='xs:int' minOccurs="0"/>
+      <xs:element name='aantalKilometersAanrijden' type='xs:int' minOccurs="0"/>
+      <xs:element name='berekendeTotaaltijd' type='xs:int' minOccurs="0"/>
+
+      <!-- Mannummer van lepelchaffeur die het transport moet doen. -->
       <xs:element name='mannummer' type='xs:int' minOccurs='0' />
 
-      <!-- Wat is "combi". Default: false. -->  
       <xs:element name='combi' type='xs:boolean' minOccurs='0'/>
-
-      <!-- Default: false. -->  
       <xs:element name='meereizendBerger' type='xs:boolean' minOccurs='0'/>
-
-      <!-- Aantal inzittenden. Default: 0. -->
       <xs:element name='aantalPersonen' type='xs:int' minOccurs='0'/>
-
       <xs:element name='bijzonderhedenTransport' type='xs:string' minOccurs='0'/>
-
-      <!-- Default: false. -->
       <xs:element name='aanhanger' type='xs:boolean' minOccurs='0'/>
-
-      <!-- Default: false. -->
       <xs:element name='veiligStellen' type='xs:boolean' minOccurs='0'/>
     </xs:all>
 
+    <!-- TODO: opweken? logixcreferentie. -->
     <xs:attribute name="actienummer" type="xs:int" use="required" />
   </xs:complexType>
 
+
+  <!--
+  - Bij transporten die waarbij voertuig en inzitten moeten worden weggebracht
+  - bepaald deze enumeratie de volgorde.
+  -->
+
   <xs:simpleType name='TransportVolgordeEnum'>
     <xs:restriction base='xs:string'>
+
+      <!-- Eerst voertuig afleveren, vervolgens inzittenden. -->
       <xs:enumeration value='VOERTUIG_INZITTENDEN' />
+
+      <!-- Eerst inzittenden afleveren, vervolgens voertuig. -->
       <xs:enumeration value='INZITTENDEN_VOERTUIG' />
+
+      <!-- Lepel/MFV hulpverlener bepaald aflevervolgorde (default). -->
+      <xs:enumeration value='HULPVERLENER_BEPAALT' />
+
     </xs:restriction>
   </xs:simpleType>
 
+
   <!--
-  - LBI-classificatie. De volgende LBI-classificaties zijn bekend:
-  -    0  incidenten op locaties zonder LBI classificaties
-  -    1  zeer verkeersgevaarlijk: direct incident magement
-  -    2  contract afspraken/incident magement
-  -    3  gevaarlijke locaties volgens ANWB
+  - LBI-classificaties.
+  -
+  - Lbi0 locaties staan binnen Dis bekent als "normale" locaties.
+  - Lbi3 locaties staan binnen Dis bekent als "lbi3" of simpelweg "lbi"
+  - locaties. Een veilig te stellen incident staat binnen Dis bekent als
+  - een "lbi3-incident" of simpelweg als een "lbi-incident".
+  -
+  - LET OP: Dis kan alleen omgaan met lbi0 of lbi3 locaties. Aanmeldingen met
+  - lbi1 of lbi2 locaties, of wijziging van bestaande incidenten naar lbi1 of
+  - lbi2 locaties worden afgekeurd. ("1" en "2" zijn hieronder vollledigheids-
+  - halve toegevoegd.)
   -->
   <xs:simpleType name="LbiClassificatieType">
     <xs:restriction base='xs:int'>
+
+      <!-- 0  incidenten op locaties zonder LBI classificaties (default) -->
       <xs:enumeration value='0'/>
+
+      <!-- 1  zeer verkeersgevaarlijk: direct incident magement -->
       <xs:enumeration value='1'/>
+
+      <!-- 2  contract afspraken/incident magement -->
       <xs:enumeration value='2'/>
+
+      <!-- 3  gevaarlijke locaties volgens ANWB -->
       <xs:enumeration value='3'/>
+
     </xs:restriction>
   </xs:simpleType>
 
+
   <!--
-  - Een OBIdis opdracht beschrijving zoals die in een
-  - <antwoordenOpdrachtinfoMessage> bericht terug gestuurd wordt naar
-  - OBIcall.
-  - (TBD: opdrachtvolgnummer -> attribute "nummer"?)
+  - Van Alc naar Dis om aan te geven dat er de klant is gebeld
+  - voor een wachttijd overschrijding ("stelactie", STEL: Service TELefoniste).
+  -
+  - Alc krijgt geen antwoord (zelfs geen ack of ok).
+  -
+  - TODO: Van 161024 mon t/m 161030 sun niet gebruikt. Gaat Flow dit ooit
+  - nog opsturen? Kunnen we dit niet verwijderen?
   -->
+
+  <xs:element name='stelMessage'>
+    <xs:complexType>
+      <xs:all>
+        <!-- De incident indentificatie. -->
+        <xs:element name='incidentnummer' type='xs:int'/>
+        <xs:element name='actienummer' type='xs:int'/>
+
+        <!-- Nieue wachttijd in minuten. -->
+        <xs:element name='nieuweWachttijd' type='xs:int'/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Van Alc naar Dis voor het opvragen van opdrachten informatie
+  - m.b.t. tot een eerder aangemeld incident.
+  -
+  - Het antwoord is een antwoordenOpdrachtinfoMessage bericht.
+  -->
+
+  <xs:element name='opvragenOpdrachtinfoMessage'>
+    <xs:complexType>
+      <xs:attribute name='incidentnummer' type='xs:int' use='required'/>
+      <xs:attribute name='actienummer' type='xs:int' use='required'/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!--
+  - Van Dis naar Alc in antwoord op een opvragenOpdrachtinfoMessage.
+  -->
+
+  <xs:element name='antwoordenOpdrachtinfoMessage'>
+    <xs:complexType>
+      <xs:all>
+        <!-- (Knullig: optioneel opdrachten met daarin 0, 1, of meer opdracht.) -->
+        <xs:element name='opdrachten' type='OpdrachtenType' minOccurs='0'/>
+      </xs:all>
+
+      <xs:attribute name='incidentnummer' type='xs:int' use='required'/>
+      <xs:attribute name='actienummer' type='xs:int' use='required'/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:complexType name='OpdrachtenType'>
+    <xs:sequence>
+      <xs:element name='opdracht' type='Opdracht'
+        minOccurs='0' maxOccurs='unbounded'/>
+    </xs:sequence>
+  </xs:complexType>
+
+
   <xs:complexType name='Opdracht'>
     <xs:all>
       <xs:element name='opdrachtvolgnummer' type='xs:int'/>
@@ -395,42 +666,143 @@ TODO: omzetten naar xs:duration
       <xs:element name='tijdstipStatus' type='xs:dateTime'/>
       <xs:element name='status' type='OpdrachtStatusEnum'/>
       <xs:element name='hulpverlenernaam' type='xs:string'/>
+
+      <!-- TODO: Dit is nog oude pechcode systematiek. -->
       <xs:element name='afloopcode' type='obi:AfloopcodeEnum' minOccurs='0'/>
-      <xs:element name='pechcode' type='xs:int'/>
+      <xs:element name='pechcode' type='xs:int' minOccurs='0' />
+
       <xs:element name='taak' type='obi:TaakTypeEnum'/>
+      <xs:element name="opdrachtResultaten" type="obi:OpdrachtResultatenType" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 
+
   <!--
-  - De OBIdis status van een opdracht.
+  - De Dis status van een opdracht.
   -->
+
   <xs:simpleType name='OpdrachtStatusEnum'>
     <xs:restriction base='xs:string'>
-      <xs:enumeration value='Aanrijden'/>
-      <xs:enumeration value='Uitvoeren'/>
-      <xs:enumeration value='Verzonden'/>
-      <xs:enumeration value='Onderbroken'/>
-      <xs:enumeration value='Einde'/>
-      <xs:enumeration value='Teruggenomen'/>
+      <!--
+      - Een opdracht kan intern in Dis voor een hulpverlener worden gereserveerd.
+      - Ze wordt dan verzonden zodra de hulpverlener zijn huidige opdracht einde
+      - meldt. De volgende status is dus meestal Verzonden.
+      - Slechts een beperkt aantal opdracht wordt ooit gereserveerd.
+      -->
       <xs:enumeration value='Gereserveerd'/>
+
+      <!--
+      - Een opdracht is Verzonden als deze naar de hulpverlener is verstuurd,
+      - maar door deze nog niet geaccepteerd is.
+      - De volgende status is meestal Aanrijden.
+      -->
+      <xs:enumeration value='Verzonden'/>
+
+      <!--
+      - De hulpverlener is in status Aanrijden als hij de opdracht
+      - geaccepteerd heeft, en onderweg is naar het pechgeval.
+      - De volgende status is meestal Uitvoeren.
+      -->
+      <xs:enumeration value='Aanrijden'/>
+
+      <!--
+      - De hulpverlener meldt uitvoeren als hij bij het pechgeval aangekomen
+      - en met de daarwerkelijke uitvoering begint.
+      - De volgende status is meestal Einde.
+      -->
+      <xs:enumeration value='Uitvoeren'/>
+ 
+      <!--
+      - De statussen Aanrijden en Uitvoeren kunnen tijdelijk door de hulpverlener
+      - worden Onderbroken. Na het onderbreken komt de hulpverlener terug in de
+      - afgebroken status.
+      -->
+      <xs:enumeration value='Onderbroken'/>
+
+      <!--
+      - Een opdracht wordt Einde wannneer de hulpverlener deze afmeldt.
+      -->
+      <xs:enumeration value='Einde'/>
+
+      <!--
+      - Een opdracht kan ook worden teruggenomen door de planner.
+      - TODO: Hier iets meer commentaar.
+      -->
+      <xs:enumeration value='Teruggenomen'/>
+
     </xs:restriction>
   </xs:simpleType>
 
+
   <!--
-  - Element dat een incident locatie beschrijft.
+  - Element dat een veiligstellocatie beschrijft.
   -->
+
+  <xs:complexType name='Veiligstellocatie'>
+    <xs:all>
+      <!-- De locatie. -->
+      <xs:element name='locatie' type='Locatie'/>
+
+      <!-- Er moet  aangegeven worden of het een service station betreft. -->
+      <xs:element name='servicestation' type='xs:boolean'/>
+    </xs:all>
+  </xs:complexType>
+
+
+  <!--
+  - Een locatiebeschrijving.
+  -
+  - Een locatie bevat in een coordinaat ((x,y) volgens het Rijksdriehoeksstelsel,
+  - of (lat,long) volgens WGS84 ("GPS")), met daarnaast optioneel aanvullende
+  - beschrijvende informatie.
+  -
+  - Voor Dis zijn slechts de coordinaten ((x,y) of (lat,lng) van belang.
+  -
+  - Alle beschrijvende locatiegegevens worden "slechts" getoond aan de 
+  - wegenwacht of de planner.
+  - Maar alleen een locatie met coordinaten zonder nadere beschrijving zoals
+  - straat- en plaats-naam zal voor de wegenwacht vermoedelijk onwerkbaar zijn.
+  -
+  - X en y zijn rijksdriehoekgscoordinaten (in hele meters) die eigenlijk
+  - alleen in Nederland bruikbaar zijn.
+  - 
+  - Lat en long zijn geografische coordinaten waarmee in ieder geval
+  - in heel (West-)Europa posities bepaald kunnen worden.
+  - In decimale graden, positief voor N en O, negatief voor Z en W.
+  -   B.v. centrum Amersfoort: lat='52.155209' lng='5.387235'
+  -   B.v. centrum Bristol: lat='51.451343' lng='-2.587585'.
+  -
+  - LET OP: of x en y, of lat and long. De aanwezigheid van (x,y) en
+  - (lat,lng) maakt een bericht ongeldig.
+  -
+  - Van Care en Flow worden (x,y) verwacht, en van Lava (lat,lng), maar niets
+  - staat in de weg dat b.v. Care in de toekomst naar (lat,lng) switched.
+  -
+  - Dis werkt intern met (x,y) coordinaten. Bij ontvangst zal Dis zal (lat,lng)
+  - omrekenen naar (x,y) daarmee werken.
+  -
+  - TODO: check: (lat,lng) volgens WGS84 ("GPS")?
+  - TODO: Omrekening van (x,y) naar (lat,lng) en v.v. volgens TBD
+  - TODO" belang wegtype?
+  - TODO: Moeten we aan locatie een expliciete coordinsatesystem toevoegen?
+  -     Mischien wel zo toekomst vast.
+  -->
+
   <xs:complexType name='Locatie'>
     <xs:all>
+
+      <xs:element name='coordinate' type='obi:Coordinate' minOccurs='0'/>
       <xs:element name='wegtype' type='obi:WegtypeEnum' minOccurs='0'/>
       <xs:element name='bijzonderheid' type='xs:string' minOccurs='0'/>
 
-      <!-- Nummer van de praatpaal. Kan een extentie bevatten.
-      (bv "11.128B"). -->
+      <!-- Nummer van de praatpaal. Bv "11.128B". -->
       <xs:element name='praatpaal' type='xs:string' minOccurs='0'/>
 
-      <!-- Afstand praatpaal. Indien negatief: pechvoertuig staat zoveel
-      meter voor de praatpaal; indien positief: pechvoertuig staat zoveel
-      meter na de de praatpaal. -->
+      <!--
+      - Afstand tot praatpaal in meters.
+      - Indien negatief: pechvoertuig staat voor de praatpaal.
+      - Indien positief: pechvoertuig staat na de de praatpaal.
+      -->
       <xs:element name='afstandPraatpaal' type='xs:int' minOccurs='0'/>
 
       <xs:element name='hectometerpaal' type='obi:Hectometerpaal' minOccurs='0'/>
@@ -445,13 +817,18 @@ TODO: omzetten naar xs:duration
 
     </xs:all>
 
-    <!-- Rijdsdriehoeks coordinaten (meters). -->
-    <xs:attribute name='x' type='xs:long'/>
-    <xs:attribute name='y' type='xs:long'/>
-    <!-- Lat, Long coordinaten (meters). -->
-    <xs:attribute name='lat' type='xs:double'/>
-    <xs:attribute name='long' type='xs:double'/>
+    <!--
+    - FIXME: Dit alles optioneel is niet leuk.
+    -->
+    <xs:attribute name='x' type='xs:long' use='optional'/>
+    <xs:attribute name='y' type='xs:long' use='optional'/>
+    <xs:attribute name='lat' type='xs:float' use='optional'/>
+    <xs:attribute name='lng' type='xs:float' use='optional'/>
+
   </xs:complexType>
+
+
+  <!-- TODO: vwb Dis kan waarschijnlijk ook plaats en straat optioneel. -->
 
   <xs:complexType name='Adres'>
     <xs:all>
@@ -460,17 +837,20 @@ TODO: omzetten naar xs:duration
 
       <xs:element name='huisnummer' type='xs:int' minOccurs='0'/>
       <xs:element name='appendix' type='xs:string' minOccurs='0'/>
+      <xs:element name="postcode" type="xs:string" minOccurs="0" />
 
       <xs:element name='kruisendeStraat' type='xs:string' minOccurs='0'/>
     </xs:all>
   </xs:complexType>
 
+
   <!--
-  - Possible Faserood values.
-  -
-  - (TBD: Dit kan wellicht beter een string enumeratie zijn met meer
-  - informatieve waarden dan nu de nummertjes.)
+  - Faserood enumeratie.
+  - "Fase rood" geeft uitsluitel over de drukte bij Dispatch. Hoe
+  - drukker hoe hoger het fase rood nummer. Bij grotere drukte worden
+  - toenemend bererkende maatregelen van kracht.
   -->
+
   <xs:simpleType name="FaseroodEnum">
     <xs:restriction base="xs:int">
       <xs:enumeration value="0"/>  <!-- geen fase rood -->
@@ -481,12 +861,22 @@ TODO: omzetten naar xs:duration
     </xs:restriction>
   </xs:simpleType>
 
+
+  <!--
+  - Dis kan opdrachten "handmatig" of automatisch inplannen, c.q. ingepland
+  - hebben. Automatisch inplannen betekent dat het automatische plannings-
+  - algoritme (dispro) de opdracht toegewezen heeft of zal toewijzing aan een
+  - hulpverlener (wegenwacht, lepel, asm, etc).
+  - "Handmatig" houdt in dat een planner in het wegenwachtstation
+  - Dispatch ("plawa") de opdracht zal of heeft ingepland.
+  -->
   <xs:simpleType name='PlanningsmethodeEnum'>
     <xs:restriction base='xs:string'>
       <xs:enumeration value='Handmatig'/>
       <xs:enumeration value='Automatisch'/>
     </xs:restriction>
   </xs:simpleType>
+
 
 </xs:schema>
 

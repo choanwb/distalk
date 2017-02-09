@@ -1,8 +1,9 @@
 package nl.anwb.hv.distalk
 
+import grails.converters.XML
 import grails.transaction.Transactional
-import org.anwb.hv.oxi.dis_logicx.LepelLocatie
 import wslite.http.auth.HTTPBasicAuthorization
+import wslite.soap.SOAPClient
 import wslite.soap.SOAPClientException
 import wslite.soap.SOAPFaultException
 import wslite.soap.SOAPResponse
@@ -18,6 +19,7 @@ class BizzTalkService {
     def readTimeout
     def user
     def password
+    public static final int PLAIN_XML = 0
     public static final int EINDEMELDEN_INCIDENT = 1
     public static final int COMPLETEREN_INCIDENT = 2
     public static final int MELDEN_STATUS = 3
@@ -26,6 +28,7 @@ class BizzTalkService {
     public static final int LEPEL_BESCHIKBAAR = 6
     public static final int LEPEL_NIET_BESHIKBAAR = 7
 
+    //TODO laatste oxi's binnenhalen
     //TODO TNS = ???????
     private static final TNS = ""
 
@@ -34,6 +37,7 @@ class BizzTalkService {
 
         if (grailsApplication.config.getProperty("lavasimulator", Boolean)) {
             send2Lavasimulator(message, msgType)
+//            sendSomething(message, msgType)
             return
         }
 
@@ -143,56 +147,68 @@ class BizzTalkService {
         }
     }
 
-    public void send2Lavasimulator(def message, final int msgType) {
-        url = grailsApplication.config.getProperty("lava.url")
-        def tns = grailsApplication.config.getProperty("lava.tns")
+    private void send2Lavasimulator(def msg, final int msgType) {
+        url = grailsApplication.config.getProperty("lavasim.url")
+        def tns = grailsApplication.config.getProperty("lavasim.tns")
         def params = [serviceURL: url]
-        withSoap(params) {
-            def response = send(){
-                envelopeAttributes xmlns: tns
-                body {
-                    switch (msgType) {
-                        case EINDEMELDEN_INCIDENT:
-                            eindemeldenIncidentMessage(xmlns: tns) {
-                                message
+
+            withSoap(params) {
+                try {
+                    def response = send() {
+                        envelopeAttributes 'xmlns:dis': tns
+                        body {
+                            switch (msgType) {
+                                case EINDEMELDEN_INCIDENT:
+                                    "dis:EindemeldenIncidentMessage"(xmlns: tns) {
+                                        mkp.yieldUnescaped("${msg}")
+                                    }
+                                    break
+                                case COMPLETEREN_INCIDENT:
+                                    completerenIncidentMessage(xmlns: tns) {
+                                        message
+                                    }
+                                    break
+                                case MELDEN_STATUS:
+                                    meldenStatusMessage(xmlns: tns) {
+                                        message
+                                    }
+                                    break
+                                case TERUGGEVEN_INCIDENT:
+                                    teruggevenIncidentMessage(xmlns: tns) {
+                                        message
+                                    }
+                                    break
+                                case LEPEL_LOCATIE:
+                                    "dis:lepelLocatie"(xmlns: tns) {
+    //                                    mkp.yieldUnescaped("${msg as XML}")
+                                        mkp.yieldUnescaped("${msg}")
+                                    }
+                                    break
+                                case LEPEL_BESCHIKBAAR:
+                                    lepelBeschikbaar(xmlns: tns) {
+                                        message
+                                    }
+                                    break
+                                case LEPEL_NIET_BESHIKBAAR:
+                                    lepelNietBeschikbaar(xmlns: tns) {
+                                        message
+                                    }
+                                    break
+                                default:
+                                    log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
+                                    return
+
+
                             }
-                            break
-                        case COMPLETEREN_INCIDENT:
-                            completerenIncidentMessage(xmlns: tns) {
-                                message
-                            }
-                            break
-                        case MELDEN_STATUS:
-                            meldenStatusMessage(xmlns: tns) {
-                                message
-                            }
-                            break
-                        case TERUGGEVEN_INCIDENT:
-                            teruggevenIncidentMessage(xmlns: tns) {
-                                message
-                            }
-                            break
-                        case LEPEL_LOCATIE:
-                            lepelLocatie(message)
-                            break
-                        case LEPEL_BESCHIKBAAR:
-                            lepelBeschikbaar(xmlns: tns) {
-                                message
-                            }
-                            break
-                        case LEPEL_NIET_BESHIKBAAR:
-                            lepelNietBeschikbaar(xmlns: tns) {
-                                message
-                            }
-                            break
-                        default:
-                            log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
-                            return
+                        }
                     }
                 }
+                catch(e) {
+                    log.error("Caught: ", e)
+                }
+//                println response.LepelLocatieResponse.text()
             }
-            println response.LepelLocatieResponse.text()
-        }
+
 //        withSoap(params) {
 //            try {
 //                def response = send("""<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:dis='http://distalk.hv.anwb.nl/'>
@@ -211,4 +227,5 @@ class BizzTalkService {
 //            }
 //        }
     }
+
 }
