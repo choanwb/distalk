@@ -14,67 +14,28 @@ import javax.jws.WebResult
 @GrailsCxfEndpoint(name ='LavaSimulatorService')
 class LavaSimulatorService {
 
-    @WebMethod
+    @WebMethod(operationName = "eindemeldenIncidentMessage", action="http://distalk.hv.anwb.nl/eindemeldenIncidentMessage")
     @WebResult(name = "EindemeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
     void eindemeldenIncidentMessage(@WebParam(name = "eindemeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")EindemeldenIncidentMessage message) {
         writeLog(message)
     }
 
-    @WebMethod
+    @WebMethod(operationName = "meldenStatus", action="http://distalk.hv.anwb.nl/meldenStatus")
     @WebResult(name = "MeldenStatusMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
-    void meldenStatusMessage(@WebParam(name="meldenStatusMessage",
+    void meldenStatus(@WebParam(name="meldenStatusMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")MeldenStatusMessage message) {
         writeLog(message)
     }
 
-    @WebMethod
+    @WebMethod(operationName = "teruggevenIncident", action="http://distalk.hv.anwb.nl/teruggevenIncident")
     @WebResult(name = "TeruggevenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
     public void teruggevenIncident(@WebParam(name = "teruggevenIncident",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")TeruggevenIncidentMessage message) {
         writeLog(message)
     }
 
-//    @WebMethod
-//    @WebResult(name = "CompleterenIncidentMessage", targetNamespace = "")
-//    public void completerenIncident(@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")CompleterenIncidentMessage message) {
-//        writeLog(message)
-//    }
-//
-//    @WebMethod
-//    @WebResult(name = "LepelLocatie", targetNamespace = "")
-//    public void lepelLocatie(@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")LepelLocatie message) {
-//        writeLog(message)
-//    }
-//
-//    @WebMethod
-//    @WebResult(name = "LepelBeschikbaar", targetNamespace = "")
-//    public void lepelBeschikbaar(@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")LepelBeschikbaar message) {
-//        writeLog(message)
-//    }
-//
-//    @WebMethod
-//    @WebResult(name = "LepelNietBeschikbaar", targetNamespace = "")
-//    public void lepelNietBeschikbaar(@WebParam(name = "",
-//    targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")LepelNietBeschikbaar message) {
-//        writeLog(message)
-//    }
 
-//    @WebMethod
-//    @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "")
-//    public void afmeldenIncidentMessage(AfmeldenIncidentMessage message){
-//        writeLog(message)
-//    }
-
-//    @WebMethod
-//    @WebResult
-//    public void test(@WebParam(name = 'name') String name) {
-//        writeLog(name)
-//    }
 
     private writeLog(def message) {
         log.info("Het volgende SOAP bericht is ontvangen: ${message}")

@@ -29,7 +29,6 @@ class AlcIncidentService {
                 message = Oxi3JaxbContext.marshall(message, validation)
             }
             Map map = stripXmlVersion(msg)
-//            def message = Oxi3JaxbContext.unmarshall(msg, validation)
             send2BizzTalkService(map)
         }
         catch(MissingMethodException mme) {
@@ -48,41 +47,6 @@ class AlcIncidentService {
         log.info("bericht: ${map.localPart} : ${map.message}")
         bizzTalkService.send2BizzTalk(map.message, map.localPart?.toUpperCase())
     }
-
-//    private void send2BizzTalkService(EindemeldenIncidentMessage message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
-//    }
-//
-//    private void send2BizzTalkService(MeldenStatusMessage message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.MELDEN_STATUS)
-//    }
-
-//    private void send2BizzTalkService(CompleterenIncidentMessage message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.COMPLETEREN_INCIDENT)
-//    }
-
-//    private void send2BizzTalkService(TeruggevenIncidentMessage message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.TERUGGEVEN_INCIDENT)
-//    }
-//
-//    private void send2BizzTalkService(LepelLocatie message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_LOCATIE)
-//    }
-//
-//    private void send2BizzTalkService(LepelBeschikbaar message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_BESCHIKBAAR)
-//    }
-
-//    private void send2BizzTalkService(LepelNietBeschikbaar message) {
-//        log.debug("bericht: ${message}")
-//        bizzTalkService.send2BizzTalk(message, bizzTalkService.LEPEL_NIET_BESHIKBAAR)
-//    }
 
     /*
     removes the version from the xml (<?xml version="1.0" encoding="UTF-8" standalone="yes"?>)

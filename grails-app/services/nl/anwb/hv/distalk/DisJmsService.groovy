@@ -37,6 +37,7 @@ class DisJmsService {
         def reply = receiveJmsMessage(receiveQueue)
         if(reply) {
             log.debug("Received reply: ${reply}")
+            //TODO doe iets met error bericht bvb. statusbericht maken
         }
         log.info("Message sent to ${requestQueue}")
         return null

@@ -30,7 +30,7 @@ jms:
     validation: false
 
 bizztalk:
-    url: http://localhost:8080/???????????
+    url: http://app22o.corp.logicx.nl/DismoTransport_1_0/statusservice.svc
     user: chi
     password: pw
     source:

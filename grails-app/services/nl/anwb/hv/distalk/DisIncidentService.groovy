@@ -27,7 +27,7 @@ class DisIncidentService {
     //targetnamespace in de methods is van belang om het automatisch gegenereerde WSDL inherent consistent
     //te maken
 
-    @WebMethod
+    @WebMethod(operationName = "aanmeldenIncident", action="http://distalk.hv.anwb.nl/aanmeldenIncident")
     @WebResult(name = "AanmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
     void aanmeldenIncident(@WebParam(name = "aanmeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")AanmeldenIncidentMessage message){
@@ -35,7 +35,7 @@ class DisIncidentService {
                 grailsApplication.config.getProperty("disel.responseQueue"))
     }
 
-    @WebMethod
+    @WebMethod(operationName = "wijzigenIncident", action="http://distalk.hv.anwb.nl/wijzigenIncident")
     @WebResult(name = "WijzigenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
     void wijzigenIncident(@WebParam(name = "wijzigenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")WijzigenIncidentMessage message){
@@ -43,7 +43,7 @@ class DisIncidentService {
                 grailsApplication.config.getProperty("disel.responseQueue"))
     }
 
-    @WebMethod
+    @WebMethod(operationName = "afmeldenIncident", action="http://distalk.hv.anwb.nl/afmeldenIncident")
     @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
     void afmeldenIncident(@WebParam(name = "afmeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")AfmeldenIncidentMessage message){
@@ -51,18 +51,4 @@ class DisIncidentService {
                 grailsApplication.config.getProperty("disel.responseQueue"))
     }
 
-
-//    @WebMethod
-//    @WebResult(name = "OpvragenPlanningsinfoMessage", targetNamespace = "")
-//    AntwoordenPlanningsinfoMessage opvragenPlanningsInfo(OpvragenPlanningsinfoMessage message){
-//        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
-//                grailsApplication.config.getProperty("disel.responseQueue"))
-//    }
-//
-//    @WebMethod
-//    @WebResult(name = "OpvragenOpdrachtinfoMessage", targetNamespace = "")
-//    AntwoordenOpdrachtinfoMessage opvragenOpdrachtInfo(OpvragenOpdrachtinfoMessage message){
-//        disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
-//                grailsApplication.config.getProperty("disel.responseQueue"))
-//    }
 }

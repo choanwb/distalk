@@ -61,7 +61,9 @@ class BizzTalkService {
         def httpResponse
         withSoap(params) {
             try {
-                //authorization = new HTTPBasicAuthorization(user, password)
+                if (!grailsApplication.config.getProperty("lavasimulator", Boolean)) {
+                    authorization = new HTTPBasicAuthorization(user, password)
+                }
                 response = send() {
                     envelopeAttributes 'xmlns:dis': tns
                     body {
@@ -77,7 +79,7 @@ class BizzTalkService {
                                 }
                                 break
                             case MELDEN_STATUS:
-                                "dis:meldenStatusMessage"(xmlns: tns) {
+                                "dis:meldenStatus"(xmlns: tns) {
                                     mkp.yieldUnescaped("${msg}")
                                 }
                                 break
