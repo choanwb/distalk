@@ -45,7 +45,7 @@ class DisIncidentService {
 
     @WebMethod
     @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
-    void afmeldenIncident(@WebParam(name = "afmeldenIncident",
+    void afmeldenIncident(@WebParam(name = "afmeldenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")AfmeldenIncidentMessage message){
         disJmsService.sendJmsMessage(message, grailsApplication.config.getProperty("disel.requestQueue"),
                 grailsApplication.config.getProperty("disel.responseQueue"))

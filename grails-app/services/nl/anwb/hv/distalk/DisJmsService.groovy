@@ -23,11 +23,17 @@ class DisJmsService {
         log.debug("Sending ${message} to ${requestQueue}")
         validation = grailsApplication.config.getProperty("jms.validation", Boolean)
         def process = grailsApplication.config.getProperty("disel.proces")
-        def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
-        jmsService.send(queue:(requestQueue), jmsMessage) { Message msg ->
-            msg.setStringProperty("PROCES", process)
+
+        try {
+            def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
+            jmsService.send(queue: (requestQueue), jmsMessage) { Message msg ->
+                msg.setStringProperty("PROCES", process)
 //            msg.setStringProperty("HERKOMST", HERKOMST)//niet van belang want de queue naam is doorslaggevend voor disel
-            msg.setJMSReplyTo(createDestination(queue: receiveQueue))
+                msg.setJMSReplyTo(createDestination(queue: receiveQueue))
+            }
+        }
+        catch(e) {
+            log.error("Caught:", e)
         }
 
         //TODO voor nu even destination, straks een receiveQueue
