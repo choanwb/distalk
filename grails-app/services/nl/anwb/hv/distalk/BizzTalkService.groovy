@@ -19,19 +19,19 @@ class BizzTalkService {
     def readTimeout
     def user
     def password
-    public static final int PLAIN_XML = 0
-    public static final int EINDEMELDEN_INCIDENT = 1
-    public static final int COMPLETEREN_INCIDENT = 2
-    public static final int MELDEN_STATUS = 3
-    public static final int TERUGGEVEN_INCIDENT = 4
-    public static final int LEPEL_LOCATIE = 5
-    public static final int LEPEL_BESCHIKBAAR = 6
-    public static final int LEPEL_NIET_BESHIKBAAR = 7
+    public static final String PLAIN_XML = ""
+    public static final String EINDEMELDEN_INCIDENT = "EINDEMELDENINCIDENTMESSAGE"
+    public static final String COMPLETEREN_INCIDENT = "COMPLETERENINCIDENTMESSAGE"
+    public static final String MELDEN_STATUS = "MELDENSTATUSMESSAGE"
+    public static final String TERUGGEVEN_INCIDENT = "TERUGGEVENINCIDENTMESSAGE"
+    public static final String LEPEL_LOCATIE = "LEPELLOCATIE"
+    public static final String LEPEL_BESCHIKBAAR = "LEPELBESCHIKBAAR"
+    public static final String LEPEL_NIET_BESHIKBAAR = "LEPELNIETBESHIKBAAR"
 
     //TODO TNS = ???????
     private static final TNS = ""
 
-    public boolean send2BizzTalk(def message, final int msgType) {
+    public boolean send2BizzTalk(def message, String msgType) {
 
         if (grailsApplication.config.getProperty("lavasimulator", Boolean)) {
             send2Lavasimulator(message, msgType)
@@ -39,7 +39,7 @@ class BizzTalkService {
         }
 
         if (grailsApplication.config.getProperty("bizztalk.nosend", Boolean)) {
-            log.info("No send flag = true")
+            log.info("No send flag = true, nothing sent")
             return
         }
         url = grailsApplication.config.getProperty("bizztalk.url")
@@ -47,113 +47,16 @@ class BizzTalkService {
                       connectTimeout: connectTimeout,
                       readTimeout: readTimeout]
         sendMessage(params, msgType, message, TNS)
-//        def response
-//        def httpResponse
-
-//        withSoap(params) {
-//            try{
-//                //authorization = new HTTPBasicAuthorization(user, password)
-//                response = send(SOAPAction: url) {
-////                    version SOAPVersion.V1_2
-//                    envelopeAttributes "xmlns":TNS
-//                    body {
-//                        switch (msgType) {
-//                        case EINDEMELDEN_INCIDENT:
-//                            eindemeldenIncidentMessage(message)
-//                            break
-//                        case COMPLETEREN_INCIDENT:
-//                            completerenIncidentMessage(message)
-//                            break
-//                        case MELDEN_STATUS:
-//                            meldenStatusMessage(message)
-//                            break
-//                        case TERUGGEVEN_INCIDENT:
-//                            teruggevenIncidentMessage(message)
-//                            break
-//                        case LEPEL_LOCATIE:
-//                            lepelLocatie(message)
-//                            break
-//                        case LEPEL_BESCHIKBAAR:
-//                            lepelBeschikbaar(message)
-//                            break
-//                        case LEPEL_NIET_BESHIKBAAR:
-//                            lepelNietBeschikbaar(message)
-//                            break
-//                        default:
-//                            log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
-//                            return
-//                        }
-//                    }
-//                }
-//                httpResponse = response?.httpResponse
-//
-//                if (response?.httpRequest?.data) {
-//                    log.debug(new String(response.httpRequest.data))
-//                }
-//
-//                def status = response//
-//                switch (status?.StatusCode) {
-//
-//                    case '0':
-//                        log.info("send2BizzTalk: Sent ${message} successfully")
-//                        break
-//
-//                    case '1':
-//                        log.error("send2BizzTalk: Technical Fault: ${status?.StatusMelding}")
-//                        httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                        httpResponse.statusMessage = status?.StatusMelding
-//                        break
-//
-//                    case '2':
-//                        log.error("send2BizzTalk: DISTALK fault: ${status?.StatusMelding}")
-//                        httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                        httpResponse.statusMessage = status?.StatusMelding
-//                        break
-//
-//                    default:
-//                        log.error("send2BizzTalk: Unexcepted StatusCode: ${status?.StatusCode}")
-//                        if (httpResponse) {
-//                            httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                            httpResponse.statusMessage = status?.StatusMelding
-//                        }
-//                        else {
-//                            log.error("send2BizzTalk: No httpResponse.")
-//                        }
-//                }
-//            }
-//            catch (SOAPFaultException sfe) {
-//                log.error("CAUGHT: $sfe.message")
-//
-//                // Need to use sfe.getResponse(), sfe.response gives HTTP response
-//                SOAPResponse soapResponse = sfe.getResponse()
-//                httpResponse = sfe.httpResponse
-//                // Oracle webservice gives SC_OK (200) even when a SOAP Fault has occurred
-//                if (httpResponse?.statusCode == SC_OK) {
-//                    httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
-//                    httpResponse.statusMessage = "Internal Server Error: ${sfe.message}"
-//                }
-//
-//                response = soapResponse
-//            }
-//            catch (SOAPClientException sce) {
-//                // This indicates an error with underlying HTTP Client (i.e., 404 Not Found)
-//                log.error("CAUGHT: $sce.message", sce)
-//                httpResponse = sce.response
-//            }
-//            catch (Throwable x) {
-//                log.error("CAUGHT: $x.message", x)
-//            }
-//        }
     }
 
-    private void send2Lavasimulator(def msg, final int msgType) {
+    private void send2Lavasimulator(def msg, String msgType) {
         url = grailsApplication.config.getProperty("lavasim.url")
         def tns = grailsApplication.config.getProperty("lavasim.tns")
         def params = [serviceURL: url]
         sendMessage(params, msgType, msg, tns)
     }
 
-    private sendMessage(def params, int msgType, def msg, String tns) {
+    private sendMessage(def params, String msgType, def msg, String tns) {
         def response
         def httpResponse
         withSoap(params) {
@@ -170,33 +73,32 @@ class BizzTalkService {
                                 break
                             case COMPLETEREN_INCIDENT:
                                 "dis:completerenIncidentMessage"(xmlns: tns) {
-                                    message
+                                    mkp.yieldUnescaped("${msg}")
                                 }
                                 break
                             case MELDEN_STATUS:
                                 "dis:meldenStatusMessage"(xmlns: tns) {
-                                    message
+                                    mkp.yieldUnescaped("${msg}")
                                 }
                                 break
                             case TERUGGEVEN_INCIDENT:
                                 "dis:teruggevenIncidentMessage"(xmlns: tns) {
-                                    message
+                                    mkp.yieldUnescaped("${msg}")
                                 }
                                 break
                             case LEPEL_LOCATIE:
                                 "dis:lepelLocatie"(xmlns: tns) {
-                                    //                                    mkp.yieldUnescaped("${msg as XML}")
                                     mkp.yieldUnescaped("${msg}")
                                 }
                                 break
                             case LEPEL_BESCHIKBAAR:
                                 "dis:lepelBeschikbaar"(xmlns: tns) {
-                                    message
+                                    mkp.yieldUnescaped("${msg}")
                                 }
                                 break
                             case LEPEL_NIET_BESHIKBAAR:
                                 "dis:lepelNietBeschikbaar"(xmlns: tns) {
-                                    message
+                                    mkp.yieldUnescaped("${msg}")
                                 }
                                 break
                             default:

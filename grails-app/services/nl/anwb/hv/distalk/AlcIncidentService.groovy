@@ -28,10 +28,9 @@ class AlcIncidentService {
                 message = Oxi3JaxbContext.unmarshall(msg, validation)
                 message = Oxi3JaxbContext.marshall(message, validation)
             }
-            message = stripXmlVersion(msg)
+            Map map = stripXmlVersion(msg)
 //            def message = Oxi3JaxbContext.unmarshall(msg, validation)
-            log.info("bericht: ${message}")
-            send2BizzTalkService(message)
+            send2BizzTalkService(map)
         }
         catch(MissingMethodException mme) {
             log.error("Could not find a method to process oxi object in this service. " +
@@ -45,20 +44,20 @@ class AlcIncidentService {
         return null//voor nu gaan we er even vanuit dat er niks terugkomt
     }
 
-    private void send2BizzTalkService(EindemeldenIncidentMessage message) {
-        log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
+    private void send2BizzTalkService(Map map) {
+        log.info("bericht: ${map.localPart} : ${map.message}")
+        bizzTalkService.send2BizzTalk(map.message, map.localPart?.toUpperCase())
     }
 
-    private void send2BizzTalkService(MeldenStatusMessage message) {
-        log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message, bizzTalkService.MELDEN_STATUS)
-    }
-
-    private void send2BizzTalkService(String message) {
-        log.debug("bericht: ${message}")
-        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
-    }
+//    private void send2BizzTalkService(EindemeldenIncidentMessage message) {
+//        log.debug("bericht: ${message}")
+//        bizzTalkService.send2BizzTalk(message, bizzTalkService.EINDEMELDEN_INCIDENT)
+//    }
+//
+//    private void send2BizzTalkService(MeldenStatusMessage message) {
+//        log.debug("bericht: ${message}")
+//        bizzTalkService.send2BizzTalk(message, bizzTalkService.MELDEN_STATUS)
+//    }
 
 //    private void send2BizzTalkService(CompleterenIncidentMessage message) {
 //        log.debug("bericht: ${message}")
@@ -88,7 +87,7 @@ class AlcIncidentService {
     /*
     removes the version from the xml (<?xml version="1.0" encoding="UTF-8" standalone="yes"?>)
      */
-    private String stripXmlVersion(String message) {
+    private Map stripXmlVersion(String message) {
         Node node = parser.parseText(message)
         node.attributes().clear()
         QName name = node.name()
@@ -96,11 +95,11 @@ class AlcIncidentService {
         String localPart = name.localPart
         if (localPart) {
             if (name.prefix) {
-                return "<${name.prefix}:${message.substring(message.indexOf(localPart))}"
+                return [localPart: localPart, message: "<${name.prefix}:${message.substring(message.indexOf(localPart))}"]
             }
-            return message.substring(message.indexOf(localPart) - 1)
+            return [localPart: localPart, message: message.substring(message.indexOf(localPart) - 1)]
         }
-        message
+        [message: message]
     }
 
 
