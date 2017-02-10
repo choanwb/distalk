@@ -16,8 +16,6 @@ class DisJmsService {
     static destination = "anwb.hv.binnenland.dispatch.disToLogicxQueue.Chi"
     Boolean validation = Boolean.FALSE
 
-
-    //TODO herkomst is voor disel van belang
     //TODO is impliciete return nodig?
     def sendJmsMessage(def message, String requestQueue, String receiveQueue) {
         log.debug("Sending ${message} to ${requestQueue}")
@@ -25,7 +23,7 @@ class DisJmsService {
         def process = grailsApplication.config.getProperty("disel.proces")
 
         try {
-            def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
+            def jmsMessage = Oxi3JaxbContext.marshall(message, validation, true)
             jmsService.send(queue: (requestQueue), jmsMessage) { Message msg ->
                 msg.setStringProperty("PROCES", process)
 //            msg.setStringProperty("HERKOMST", HERKOMST)//niet van belang want de queue naam is doorslaggevend voor disel
@@ -36,7 +34,6 @@ class DisJmsService {
             log.error("Caught:", e)
         }
 
-        //TODO voor nu even destination, straks een receiveQueue
         def reply = receiveJmsMessage(receiveQueue)
         if(reply) {
             log.debug("Received reply: ${reply}")
