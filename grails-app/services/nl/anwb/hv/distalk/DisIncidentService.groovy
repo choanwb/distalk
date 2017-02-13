@@ -16,16 +16,13 @@ import javax.jws.WebParam
 import javax.jws.WebResult
 
 /**
- * Uitgecommentarieerde berichten zullen in de eerste versies nog niet gebruikt worden
+ * Verwerkt binnenkomende berichten
  */
 @Transactional
 @GrailsCxfEndpoint(name ='DisIncidentService')
 class DisIncidentService {
     def disJmsService
     def grailsApplication
-
-    //targetnamespace in de methods is van belang om het automatisch gegenereerde WSDL inherent consistent
-    //te maken
 
     @WebMethod(operationName = "aanmeldenIncident", action="http://distalk.hv.anwb.nl/aanmeldenIncident")
     @WebResult(name = "AanmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")

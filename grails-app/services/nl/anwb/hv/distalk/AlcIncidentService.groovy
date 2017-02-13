@@ -10,7 +10,7 @@ import org.anwb.hv.oxi3.util.Oxi3JaxbContext
 import org.xml.sax.InputSource
 
 /**
- * Uitgecommentarieerde berichten zullen in de eerste versies nog niet gebruikt worden
+ * Stuurt berichten naar BizzTalk zonder kennis van de inhoud
  */
 @Transactional
 class AlcIncidentService {
@@ -58,7 +58,7 @@ class AlcIncidentService {
         name.namespaceURI = ''
         String localPart = name.localPart
         if (localPart) {
-            if (name.prefix) {
+            if (name.prefix) {//als er iets als ns2: voor staat
                 return [localPart: localPart, message: "<${name.prefix}:${message.substring(message.indexOf(localPart))}"]
             }
             return [localPart: localPart, message: message.substring(message.indexOf(localPart) - 1)]

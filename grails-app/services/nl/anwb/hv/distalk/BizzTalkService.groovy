@@ -26,7 +26,7 @@ class BizzTalkService {
     public static final String TERUGGEVEN_INCIDENT = "TERUGGEVENINCIDENTMESSAGE"
     public static final String LEPEL_LOCATIE = "LEPELLOCATIE"
     public static final String LEPEL_BESCHIKBAAR = "LEPELBESCHIKBAAR"
-    public static final String LEPEL_NIET_BESHIKBAAR = "LEPELNIETBESHIKBAAR"
+    public static final String LEPEL_NIET_BESHIKBAAR = "ALLELEPELSNIETBESCHIKBAAR"
 
     //TODO TNS = ???????
     private static final TNS = ""
@@ -73,11 +73,6 @@ class BizzTalkService {
                                     mkp.yieldUnescaped("${msg}")
                                 }
                                 break
-                            case COMPLETEREN_INCIDENT:
-                                "dis:completerenIncidentMessage"(xmlns: tns) {
-                                    mkp.yieldUnescaped("${msg}")
-                                }
-                                break
                             case MELDEN_STATUS:
                                 "dis:meldenStatus"(xmlns: tns) {
                                     mkp.yieldUnescaped("${msg}")
@@ -89,19 +84,28 @@ class BizzTalkService {
                                 }
                                 break
                             case LEPEL_LOCATIE:
-                                "dis:lepelLocatie"(xmlns: tns) {
-                                    mkp.yieldUnescaped("${msg}")
-                                }
+//                                "dis:lepelLocatie"(xmlns: tns) {
+//                                    mkp.yieldUnescaped("${msg}")
+//                                }
+                                log.warn("Niet geimplementeerd: ${msgType}")
                                 break
                             case LEPEL_BESCHIKBAAR:
-                                "dis:lepelBeschikbaar"(xmlns: tns) {
-                                    mkp.yieldUnescaped("${msg}")
-                                }
+//                                "dis:lepelBeschikbaar"(xmlns: tns) {
+//                                    mkp.yieldUnescaped("${msg}")
+//                                }
+                                log.warn("Niet geimplementeerd: ${msgType}")
                                 break
                             case LEPEL_NIET_BESHIKBAAR:
-                                "dis:lepelNietBeschikbaar"(xmlns: tns) {
-                                    mkp.yieldUnescaped("${msg}")
-                                }
+//                                "dis:lepelNietBeschikbaar"(xmlns: tns) {
+//                                    mkp.yieldUnescaped("${msg}")
+//                                }
+                                log.warn("Niet geimplementeerd: ${msgType}")
+                                break
+                            case COMPLETEREN_INCIDENT:
+//                                "dis:completerenIncidentMessage"(xmlns: tns) {
+//                                    mkp.yieldUnescaped("${msg}")
+//                                }
+                                log.warn("Niet geimplementeerd: ${msgType}")
                                 break
                             default:
                                 log.warn("Onbekend verzoek verstuurd, geen bericht verzonden")
@@ -137,7 +141,7 @@ class BizzTalkService {
                         break
 
                     default:
-                        log.error("send2BizzTalk: Unexcepted StatusCode: ${status?.StatusCode}")
+                        log.error("send2BizzTalk: Unexpected StatusCode: ${status?.StatusCode}")
                         if (httpResponse) {
                             httpResponse.statusCode = SC_INTERNAL_SERVER_ERROR
                             httpResponse.statusMessage = status?.StatusMelding

@@ -23,7 +23,7 @@ class DisJmsService {
         def process = grailsApplication.config.getProperty("disel.proces")
 
         try {
-            def jmsMessage = Oxi3JaxbContext.marshall(message, validation, true)
+            def jmsMessage = Oxi3JaxbContext.marshall(message, validation)
             jmsService.send(queue: (requestQueue), jmsMessage) { Message msg ->
                 msg.setStringProperty("PROCES", process)
 //            msg.setStringProperty("HERKOMST", HERKOMST)//niet van belang want de queue naam is doorslaggevend voor disel
@@ -37,7 +37,7 @@ class DisJmsService {
         def reply = receiveJmsMessage(receiveQueue)
         if(reply) {
             log.debug("Received reply: ${reply}")
-            //TODO doe iets met error bericht bvb. statusbericht maken
+            //TODO doe iets met error bericht bvb. statusbericht maken, let op vertraging
         }
         log.info("Message sent to ${requestQueue}")
         return null
