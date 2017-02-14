@@ -13,13 +13,14 @@ class DisJmsService {
 //    private static final String HERKOMST = "LOGICX"
     static exposes = ["jms"]
     static isTopic = Boolean.FALSE
+    //TODO dit is mijn queue
     static destination = "anwb.hv.binnenland.dispatch.disToLogicxQueue.Chi"
     Boolean validation = Boolean.FALSE
 
     //TODO is impliciete return nodig?
     def sendJmsMessage(def message, String requestQueue, String receiveQueue) {
         log.debug("Sending ${message} to ${requestQueue}")
-        validation = grailsApplication.config.getProperty("jms.validation", Boolean)
+        validation = grailsApplication.config.getProperty("schemavalidation", Boolean)
         def process = grailsApplication.config.getProperty("disel.proces")
 
         try {
@@ -32,6 +33,7 @@ class DisJmsService {
         }
         catch(e) {
             log.error("Caught:", e)
+            //TODO bericht naar LAVA
         }
 
         def reply = receiveJmsMessage(receiveQueue)

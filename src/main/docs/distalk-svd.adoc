@@ -1,0 +1,11 @@
+= DisTalk SVD
+DisScrum Team
+v0, 0-0-0000
+:doctype: book
+:toc:
+:lang: nl
+:sectlinks:
+:revnumber: {docVersion}
+:revdate: {localDate}
+
+include::release_notes.adoc[]

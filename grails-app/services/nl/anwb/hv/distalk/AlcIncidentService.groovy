@@ -21,7 +21,7 @@ class AlcIncidentService {
     Boolean oxiCheck = Boolean.FALSE
 
     def process(def msg) {
-        validation = grailsApplication.config.getProperty("jms.validation", Boolean)
+        validation = grailsApplication.config.getProperty("schemavalidation", Boolean)
         try {
             def message
             if (oxiCheck){

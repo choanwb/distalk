@@ -27,6 +27,7 @@ class BizzTalkService {
     public static final String LEPEL_LOCATIE = "LEPELLOCATIE"
     public static final String LEPEL_BESCHIKBAAR = "LEPELBESCHIKBAAR"
     public static final String LEPEL_NIET_BESHIKBAAR = "ALLELEPELSNIETBESCHIKBAAR"
+    public static final String AFMELDEN_INCIDENT = "AFMELDENINCIDENTMESSAGE"
 
     //TODO TNS = ???????
     private static final TNS = ""
@@ -56,6 +57,14 @@ class BizzTalkService {
         sendMessage(params, msgType, msg, tns)
     }
 
+//    private getBody(def msg, String tns, String command) {
+//        return { ->
+//            "dis:${command}"(xmlns: tns) {
+//                mkp.yieldUnescaped("${msg}")
+//            }
+//        }
+//    }
+
     private sendMessage(def params, String msgType, def msg, String tns) {
         def response
         def httpResponse
@@ -68,6 +77,8 @@ class BizzTalkService {
                     envelopeAttributes 'xmlns:dis': tns
                     body {
                         switch (msgType) {
+                            //TODO alle dubbele code eruit, dit kan veel slimmer
+                            //niet geimplementeerde berichten eerder afvangen
                             case EINDEMELDEN_INCIDENT:
                                 "dis:eindemeldenIncidentMessage"(xmlns: tns) {
                                     mkp.yieldUnescaped("${msg}")
@@ -79,7 +90,12 @@ class BizzTalkService {
                                 }
                                 break
                             case TERUGGEVEN_INCIDENT:
-                                "dis:teruggevenIncidentMessage"(xmlns: tns) {
+                                "dis:teruggevenIncident"(xmlns: tns) {
+                                    mkp.yieldUnescaped("${msg}")
+                                }
+                                break
+                            case AFMELDEN_INCIDENT:
+                                "dis:afmeldingIncident"(xmlns:tns) {
                                     mkp.yieldUnescaped("${msg}")
                                 }
                                 break

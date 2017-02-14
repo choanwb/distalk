@@ -4,6 +4,7 @@ import grails.transaction.Transactional
 import org.anwb.hv.ict.oxi.callinc.EindemeldenIncidentMessage
 import org.anwb.hv.ict.oxi.callinc.MeldenStatusMessage
 import org.anwb.hv.ict.oxi.callinc.TeruggevenIncidentMessage
+import org.anwb.hv.ict.oxi.disinc.AfmeldenIncidentMessage
 import org.grails.cxf.utils.GrailsCxfEndpoint
 
 import javax.jws.WebMethod
@@ -28,9 +29,16 @@ class LavaSimulatorService {
         writeLog(message)
     }
 
+    @WebMethod(operationName = "afmeldingIncident", action="http://distalk.hv.anwb.nl/afmeldingIncident")
+    @WebResult(name = "AfmeldenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")
+    public void afmeldingIncident(@WebParam(name = "afmeldenIncidentMessage",
+            targetNamespace = "http://anwb.org/hv/ict/oxi/disinc")AfmeldenIncidentMessage message){
+        writeLog(message)
+    }
+
     @WebMethod(operationName = "teruggevenIncident", action="http://distalk.hv.anwb.nl/teruggevenIncident")
     @WebResult(name = "TeruggevenIncidentMessage", targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")
-    public void teruggevenIncident(@WebParam(name = "teruggevenIncident",
+    public void teruggevenIncident(@WebParam(name = "teruggevenIncidentMessage",
             targetNamespace = "http://anwb.org/hv/ict/oxi/callinc")TeruggevenIncidentMessage message) {
         writeLog(message)
     }

@@ -1,0 +1,10 @@
+== Release Notes
+
+=== DisTalk 1.0
+
+Deze versie is de eerste oplevering van DisTalk. Hierin is de basiscommunicatie geregeld tussen
+het Dispatch landschap en LAVA via de webservice BizzTalk.
+
+==== DisTalk 1.0.0.0
+
+* [DISSCRUM-2657] Aanpassing HV-BUS voor verwerken berichten vanuit LAVA

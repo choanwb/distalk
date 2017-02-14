@@ -27,7 +27,8 @@ jms:
     broker: tcp://dhglx1003:2523
     user: DISPATCH_USER
     passwd: DISPATCH_PWD
-    validation: false
+
+schemavalidation: false
 
 bizztalk:
     url: http://app22o.corp.logicx.nl/DismoTransport_1_0/statusservice.svc
@@ -41,7 +42,7 @@ bizztalk:
 lavasimulator: true
 
 lavasim:
-    url: http://localhost:8080/disservices/lavasimulator
+    url: http://localhost:8080/distalk/disservices/lavasimulator
     tns: http://distalk.hv.anwb.nl/
 
 #naam waaronder de services beschikbaar zijn
